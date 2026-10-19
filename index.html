@@ -1,0 +1,2034 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSS — Painel Operacional | Edifício Condessa</title>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<style>
+:root {
+  --gold: #a8892e;
+  --gold-light: #c9a84c;
+  --bg: #0d0b08;
+  --bg-card: #161310;
+  --bg-input: #1c1814;
+  --text: #e8e0d4;
+  --text-muted: #b0a898;
+  --text-light: #f5f0e8;
+  --border: rgba(201, 168, 76, 0.2);
+  --font-serif: 'Merriweather', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 0.9rem;
+  padding-bottom: 60px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,11,8,0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+header .logo {
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+header .logo span { color: var(--text-muted); font-weight: 300; }
+header .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+header .actions button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.35rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.2s;
+}
+header .actions button:hover { border-color: var(--gold); color: var(--gold); }
+header .actions button.primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+header .actions button.primary:hover { background: var(--gold-light); }
+header .actions button.danger { border-color: #c97a4c; color: #c97a4c; }
+header .actions button.danger:hover { background: rgba(201,122,76,0.1); }
+nav.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 52px;
+  z-index: 99;
+  overflow-x: auto;
+}
+nav.tabs button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+nav.tabs button:hover { color: var(--text-light); background: rgba(201,168,76,0.06); }
+nav.tabs button.active { color: var(--gold); background: rgba(201,168,76,0.1); font-weight: 600; }
+main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+h1 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--gold); margin-bottom: 0.3rem; }
+h2 { font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-light); margin-top: 1.5rem; margin-bottom: 0.8rem; }
+h3 { font-size: 0.78rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1.2rem; margin-bottom: 0.4rem; }
+h4 { font-size: 0.72rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1.2rem; margin-bottom: 0.4rem; }
+p { margin-bottom: 0.8rem; color: var(--text); }
+.subtitle { color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem; font-size: 0.85rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; }
+label { display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; margin-top: 0.8rem; }
+input[type="text"], input[type="date"], input[type="time"], input[type="email"], input[type="tel"], input[type="number"], input[type="file"], textarea, select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-light);
+  padding: 0.55rem 0.7rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+}
+input[type="file"] { cursor: pointer; padding: 0.4rem; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); }
+textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.7rem; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.3rem; }
+.checkbox-group label { display: flex; align-items: center; gap: 0.35rem; text-transform: none; letter-spacing: 0; font-size: 0.82rem; color: var(--text); margin: 0; cursor: pointer; }
+.checkbox-group input[type="checkbox"] { width: auto; accent-color: var(--gold); }
+table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.8rem; }
+th { background: var(--bg-input); color: var(--gold); text-align: left; padding: 0.45rem 0.6rem; border-bottom: 2px solid var(--gold); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; }
+td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--border); }
+.status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13,11,8,0.97); backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding: 0.5rem 1.5rem; font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; color: var(--text-muted); }
+.status-bar .saved { color: #6b9e6b; }
+.status-bar .unsaved { color: #c97a4c; }
+.badge { display: inline-block; background: rgba(201,168,76,0.15); color: var(--gold); padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.btn { display: inline-block; background: var(--gold); color: var(--bg); border: none; border-radius: 4px; padding: 0.55rem 1.1rem; font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; text-decoration: none; margin-right: 0.4rem; margin-top: 0.5rem; }
+.btn:hover { background: var(--gold-light); }
+.btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+.btn-outline:hover { background: rgba(201,168,76,0.1); }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.65rem; }
+#contrato-conteudo { background: #fff; color: #111; padding: 2rem; border-radius: 6px; font-family: Georgia, serif; font-size: 0.8rem; line-height: 1.7; }
+#contrato-conteudo h1 { color: #111; font-size: 1.3rem; text-align: center; }
+#contrato-conteudo p { color: #111; }
+#contrato-conteudo strong { color: #000; }
+#contrato-conteudo table { color: #111; }
+#contrato-conteudo td { border-color: #ccc; }
+.hash-box { background: var(--bg-input); padding: 0.5rem 0.7rem; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.68rem; word-break: break-all; color: var(--gold); margin-top: 0.3rem; }
+.pdf-preview-box { background: var(--bg-input); padding: 1rem; border-radius: 6px; margin-top: 0.8rem; }
+iframe.pdf-viewer { width: 100%; height: 500px; border: 1px solid var(--border); border-radius: 4px; margin-top: 0.5rem; }
+progress { appearance: none; border: none; background: var(--bg-input); border-radius: 4px; overflow: hidden; }
+progress::-webkit-progress-bar { background: var(--bg-input); border-radius: 4px; }
+progress::-webkit-progress-value { background: var(--gold); border-radius: 4px; }
+progress::-moz-progress-bar { background: var(--gold); border-radius: 4px; }
+@media (max-width: 768px) {
+  header { flex-direction: column; align-items: flex-start; }
+  nav.tabs { top: auto; position: relative; }
+  h1 { font-size: 1.4rem; }
+  main { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚖️ LSS <span>OPERACIONAL</span></div>
+  <div class="actions">
+    <button onclick="exportarJSON()" class="primary">📥 Exportar JSON</button>
+    <button onclick="document.getElementById('import-file').click()">📤 Importar</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importarJSON(event)">
+    <button onclick="sincronizarNuvem()">☁️ Nuvem</button>
+    <button onclick="limparTudo()" class="danger">🗑️ Limpar</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="active" data-tab="painel">Painel</button>
+  <button data-tab="intake">1. Intake</button>
+  <button data-tab="protocolo">2. F1–F10</button>
+  <button data-tab="inventario">3. Inventário</button>
+  <button data-tab="matriz">4. Matriz</button>
+  <button data-tab="contradicoes">5. Contradições</button>
+  <button data-tab="preservacao">6. Preservação</button>
+  <button data-tab="testemunhas">7. Testemunhas</button>
+  <button data-tab="lacunas">8. Lacunas</button>
+  <button data-tab="executive">9. Executive</button>
+  <button data-tab="counsel">10. Counsel</button>
+  <button data-tab="contrato">Contrato</button>
+  <button data-tab="pagamentos">Pagamentos</button>
+  <button data-tab="assinatura">Assinatura</button>
+  <button data-tab="midias">Mídias</button>
+  <button data-tab="eventos">Eventos</button>
+<button data-tab="indexacao">Indexação</button>
+<button data-tab="plano">Plano</button>
+</nav>
+<!-- ══════════ 17. INDEXAÇÃO ══════════ -->
+<div class="tab-content" id="tab-indexacao">
+  <span class="badge">Operacional</span>
+  <h1>Indexação dos 186 Vídeos</h1>
+  <p class="subtitle">Preencha enquanto assiste. Auto-save ativo.</p>
+
+  <div class="card">
+    <h3>Filtros</h3>
+    <div class="row">
+      <div>
+        <label>Filtrar por Evento</label>
+        <select id="idx-filtro-evento" onchange="renderizarIndexacao()">
+          <option value="">Todos</option>
+          <option value="E01">E01 — Agressão Valtenis</option>
+          <option value="E02">E02 — Ameaças Sequenciais</option>
+          <option value="E03">E03 — Contexto</option>
+          <option value="">(sem evento)</option>
+        </select>
+      </div>
+      <div>
+        <label>Filtrar por Status</label>
+        <select id="idx-filtro-status" onchange="renderizarIndexacao()">
+          <option value="">Todos</option>
+          <option value="pendente">⏳ Pendente</option>
+          <option value="visto">✅ Visto</option>
+          <option value="incompleto">⚠️ Incompleto</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="exportarIndexacaoCSV()" style="margin-top:1rem;">📥 Exportar CSV</button>
+  </div>
+
+  <div id="indexacao-container"></div>
+</div>
+
+<!-- ══════════ 18. PLANO ══════════ -->
+<div class="tab-content" id="tab-plano">
+  <span class="badge">Estratégico</span>
+  <h1>Plano de Visualização</h1>
+  <p class="subtitle">Acompanhe o progresso dos 186 vídeos por fase.</p>
+
+  <div class="card">
+    <h3>Progresso Geral</h3>
+    <div id="plano-progresso"></div>
+  </div>
+
+  <div class="card">
+    <h3>FASE 1 — E01 Agressão Valtenis (22/12/2025)</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">37 vídeos críticos | 35–40 min | Prioridade 🔴 ALTA</p>
+    <div id="plano-fase1"></div>
+  </div>
+
+  <div class="card">
+    <h3>FASE 2 — E02 Ameaças Sequenciais (29/05–07/09/2026)</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">48 vídeos críticos | 45–50 min | Prioridade 🔴 ALTA</p>
+    <div id="plano-fase2"></div>
+  </div>
+
+  <div class="card">
+    <h3>FASE 3 — Contexto (Jun–Set/2026)</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">36 vídeos | 30–60 min | Prioridade 🟢 BAIXA</p>
+    <div id="plano-fase3"></div>
+  </div>
+
+  <div class="card">
+    <h3>Checklist Pré-Reunião</h3>
+    <div id="plano-checklist"></div>
+  </div>
+</div>
+<main>
+
+<!-- ══════════ PAINEL ══════════ -->
+<div class="tab-content active" id="tab-painel">
+  <span class="badge">Painel Operacional</span>
+  <h1>Litigation Support Strategist</h1>
+  <p class="subtitle">Arquiteto de Caso — Fatos, Provas, Dossiê</p>
+  <div class="card">
+    <h3>Identificação do Caso Atual</h3>
+    <div class="row">
+      <div><label>Nome do Caso</label><input type="text" data-field="caso.nome" placeholder="Ex: Edifício Condessa"></div>
+      <div><label>Data de Abertura</label><input type="date" data-field="caso.data"></div>
+    </div>
+    <label>Responsável</label>
+    <input type="text" data-field="caso.responsavel" value="Solomon Von Herclestein" readonly>
+  </div>
+  <div class="card">
+    <h3>Status dos Formulários</h3>
+    <div id="status-formularios"></div>
+  </div>
+  <div class="card">
+    <h3>Resumo Financeiro</h3>
+    <div id="resumo-financeiro"></div>
+  </div>
+  <div class="card">
+    <h3>Backup e Sincronização</h3>
+    <p>Os dados são salvos automaticamente no navegador. Para backup na nuvem, use o botão "Nuvem" ou exporte o JSON.</p>
+    <button class="btn" onclick="exportarJSON()">📥 Exportar JSON</button>
+    <button class="btn btn-outline" onclick="sincronizarNuvem()">☁️ Sincronizar Nuvem</button>
+  </div>
+</div>
+
+<!-- ══════════ 1. INTAKE ══════════ -->
+<div class="tab-content" id="tab-intake">
+  <span class="badge">Formulário 1</span>
+  <h1>Intake Estratégico</h1>
+  <p class="subtitle">Primeiro contato com o cliente.</p>
+  <div class="card">
+    <h3>1. Identificação do Cliente</h3>
+    <label>Nome / Razão Social</label><input type="text" data-field="intake.cliente">
+    <label>Representante</label><input type="text" data-field="intake.representante">
+    <div class="row">
+      <div><label>Contato</label><input type="tel" data-field="intake.contato"></div>
+      <div><label>E-mail</label><input type="email" data-field="intake.email"></div>
+    </div>
+    <label>Endereço</label><input type="text" data-field="intake.endereco">
+  </div>
+  <div class="card">
+    <h3>2. Objetivo do Cliente</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" data-field="intake.objetivo.afastamento"> Afastamento / exclusão</label>
+      <label><input type="checkbox" data-field="intake.objetivo.criminal"> Medida criminal</label>
+      <label><input type="checkbox" data-field="intake.objetivo.indenizacao"> Indenização</label>
+      <label><input type="checkbox" data-field="intake.objetivo.organizacao"> Organização de caso</label>
+    </div>
+    <label>Outro objetivo</label><input type="text" data-field="intake.objetivo.outro">
+  </div>
+  <div class="card">
+    <h3>3. Pessoas Envolvidas</h3>
+    <label>Agressor</label><input type="text" data-field="intake.agressor">
+    <label>Vítimas</label><input type="text" data-field="intake.vitimas">
+    <label>Testemunhas</label><input type="text" data-field="intake.testemunhas">
+    <label>Autoridades envolvidas</label><input type="text" data-field="intake.autoridades">
+  </div>
+  <div class="card">
+    <h3>4. Incidentes Críticos</h3>
+    <label>Incidente 1</label><textarea data-field="intake.incidente1"></textarea>
+    <label>Incidente 2</label><textarea data-field="intake.incidente2"></textarea>
+    <label>Incidente 3</label><textarea data-field="intake.incidente3"></textarea>
+  </div>
+  <div class="card">
+    <h3>5. Urgências Documentais</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" data-field="intake.urgencia.cftv"> CFTV em risco</label>
+      <label><input type="checkbox" data-field="intake.urgencia.mensagens"> Mensagens em risco</label>
+      <label><input type="checkbox" data-field="intake.urgencia.bo"> BO a registrar</label>
+      <label><input type="checkbox" data-field="intake.urgencia.laudo"> Laudo a obter</label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>6. Primeira Matriz de Risco</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" data-field="intake.risco.ameaca"> Existe ameaça atual</label>
+      <label><input type="checkbox" data-field="intake.risco.repeticao"> Risco de repetição imediata</label>
+      <label><input type="checkbox" data-field="intake.risco.bifurcacao"> Provável bifurcação criminal + civil</label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>7. Observações</h3>
+    <textarea data-field="intake.observacoes" style="min-height:100px;"></textarea>
+  </div>
+</div>
+
+<!-- ══════════ 2. PROTOCOLO F1–F10 ══════════ -->
+<div class="tab-content" id="tab-protocolo">
+  <span class="badge">Formulário 2</span>
+  <h1>Protocolo F1–F10</h1>
+  <p class="subtitle">Entrevista estruturada por incidente, com anexos vinculados.</p>
+  <div id="protocolo-container"></div>
+  <button class="btn" onclick="adicionarIncidente()">+ Adicionar Incidente</button>
+</div>
+
+<!-- ══════════ 3. INVENTÁRIO ══════════ -->
+<div class="tab-content" id="tab-inventario">
+  <span class="badge">Formulário 3</span>
+  <h1>Inventário Documental</h1>
+  <p class="subtitle">Visão consolidada de todos os documentos do caso.</p>
+  <div class="card">
+    <h3>Como funciona</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">Esta aba lê automaticamente todos os arquivos anexados nos Protocolos F1–F10. Você também pode adicionar documentos avulsos.</p>
+  </div>
+  <div class="card">
+    <h3>Adicionar Documento Avulso</h3>
+    <label>Tipo</label>
+    <select id="inv-tipo">
+      <option value="">—</option>
+      <option>BO</option><option>Laudo Médico</option><option>CFTV</option>
+      <option>Mensagens/Áudio</option><option>Ata de Assembleia</option><option>Convenção</option>
+      <option>Notificações</option><option>Fotos/Vídeos</option><option>Contrato</option><option>Outro</option>
+    </select>
+    <label>Descrição</label><input type="text" id="inv-desc">
+    <label>Controlado por</label><input type="text" id="inv-controlador">
+    <label>Estado</label>
+    <select id="inv-estado">
+      <option value="✅ Íntegro">✅ Íntegro</option>
+      <option value="⏳ Em obtenção">⏳ Em obtenção</option>
+      <option value="⚠️ Em risco">⚠️ Em risco</option>
+      <option value="❌ Perdido">❌ Perdido</option>
+    </select>
+    <label>Upload de Arquivo</label>
+    <input type="file" id="inv-file" accept="video/*,audio/*,image/*,application/pdf" multiple>
+    <label style="margin-top:0.5rem;">Upload de Pasta</label>
+    <input type="file" id="inv-pasta" webkitdirectory directory multiple>
+    <button class="btn" onclick="adicionarDocumentoAvulso()" style="margin-top:1rem;">📤 Adicionar ao Inventário</button>
+  </div>
+  <div class="card" id="inv-progresso-box" style="display:none;">
+    <h3>Progresso</h3>
+    <p id="inv-progresso-text" style="font-size:0.85rem;"></p>
+    <progress id="inv-progresso-bar" value="0" max="100" style="width:100%; height:10px;"></progress>
+  </div>
+  <h2>Documentos do Caso</h2>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Filtrar por Tipo</label>
+        <select id="inv-filtro-tipo" onchange="renderizarInventario()">
+          <option value="">Todos</option>
+          <option>BO</option><option>Laudo Médico</option><option>CFTV</option>
+          <option>Mensagens/Áudio</option><option>Ata de Assembleia</option><option>Convenção</option>
+          <option>Notificações</option><option>Fotos/Vídeos</option><option>Contrato</option><option>Outro</option>
+        </select>
+      </div>
+      <div>
+        <label>Filtrar por Incidente</label>
+        <select id="inv-filtro-incidente" onchange="renderizarInventario()"><option value="">Todos</option></select>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="exportarInventarioCSV()" style="margin-top:1rem;">📥 Exportar CSV</button>
+  </div>
+  <div id="inventario-container"></div>
+</div>
+
+<!-- ══════════ 4. MATRIZ ══════════ -->
+<div class="tab-content" id="tab-matriz">
+  <span class="badge">Formulário 4</span>
+  <h1>Matriz Probatória</h1>
+  <p class="subtitle">Relação fato × prova.</p>
+  <div id="matriz-container"></div>
+  <button class="btn" onclick="adicionarEpisodioMatriz()">+ Adicionar Episódio</button>
+</div>
+
+<!-- ══════════ 5. CONTRADIÇÕES ══════════ -->
+<div class="tab-content" id="tab-contradicoes">
+  <span class="badge">Formulário 5</span>
+  <h1>Contradiction Matrix</h1>
+  <p class="subtitle">Mapeamento de contradições.</p>
+  <div id="contradicoes-container"></div>
+  <button class="btn" onclick="adicionarContradicao()">+ Adicionar Contradição</button>
+</div>
+
+<!-- ══════════ 6. PRESERVAÇÃO ══════════ -->
+<div class="tab-content" id="tab-preservacao">
+  <span class="badge">Formulário 6</span>
+  <h1>Preservation Log</h1>
+  <p class="subtitle">Controle de preservação de evidências.</p>
+  <div id="preservacao-container"></div>
+  <button class="btn" onclick="adicionarPreservacao()">+ Adicionar Evidência</button>
+</div>
+
+<!-- ══════════ 7. TESTEMUNHAS ══════════ -->
+<div class="tab-content" id="tab-testemunhas">
+  <span class="badge">Formulário 7</span>
+  <h1>Witness Intelligence</h1>
+  <p class="subtitle">Mapa de testemunhas.</p>
+  <div id="testemunhas-container"></div>
+  <button class="btn" onclick="adicionarTestemunha()">+ Adicionar Testemunha</button>
+</div>
+
+<!-- ══════════ 8. LACUNAS ══════════ -->
+<div class="tab-content" id="tab-lacunas">
+  <span class="badge">Formulário 8</span>
+  <h1>Gap Analysis</h1>
+  <p class="subtitle">Identificação de lacunas.</p>
+  <div id="lacunas-container"></div>
+  <button class="btn" onclick="adicionarLacuna()">+ Adicionar Lacuna</button>
+</div>
+<!-- ══════════ 9. EXECUTIVE BRIEF ══════════ -->
+<div class="tab-content" id="tab-executive">
+  <span class="badge">Formulário 9</span>
+  <h1>Executive Brief</h1>
+  <p class="subtitle">Documento-síntese para o counsel.</p>
+  <div class="card">
+    <h3>Problema Identificado</h3>
+    <textarea data-field="executive.problema"></textarea>
+    <h3>Fatos Críticos</h3>
+    <textarea data-field="executive.fatos"></textarea>
+    <h3>Provas Disponíveis</h3>
+    <textarea data-field="executive.provas"></textarea>
+    <h3>Riscos Imediatos</h3>
+    <textarea data-field="executive.riscos"></textarea>
+    <h3>Questões para o Profissional Habilitado</h3>
+    <textarea data-field="executive.questoes"></textarea>
+    <h3>Próximos Passos</h3>
+    <textarea data-field="executive.proximos"></textarea>
+  </div>
+</div>
+
+<!-- ══════════ 10. COUNSEL ══════════ -->
+<div class="tab-content" id="tab-counsel">
+  <span class="badge">Formulário 10</span>
+  <h1>Critérios de Seleção de Counsel</h1>
+  <p class="subtitle">Critérios técnicos para seleção de advogado.</p>
+  <div class="card">
+    <p style="font-size:0.8rem; color:var(--text-muted);">Este documento tem caráter exclusivamente técnico e informativo. Não constitui indicação, recomendação ou intermediação. A escolha, contratação e remuneração do profissional são de responsabilidade exclusiva do Cliente.</p>
+  </div>
+  <div id="counsel-container"></div>
+  <button class="btn" onclick="adicionarCriterioCounsel()">+ Adicionar Critério</button>
+</div>
+
+<!-- ══════════ 11. CONTRATO ══════════ -->
+<div class="tab-content" id="tab-contrato">
+  <span class="badge">Operacional</span>
+  <h1>Contrato</h1>
+  <p class="subtitle">Geração do contrato preenchido com os dados do caso.</p>
+  <div class="card">
+    <h3>Dados do Consultor</h3>
+    <div class="row">
+      <div><label>CPF</label><input type="text" data-field="contrato.consultor.cpf" placeholder="000.000.000-00"></div>
+      <div><label>Telefone</label><input type="tel" data-field="contrato.consultor.telefone"></div>
+    </div>
+    <label>E-mail</label><input type="email" data-field="contrato.consultor.email">
+    <label>Chave PIX (opcional)</label><input type="text" data-field="contrato.consultor.pix">
+  </div>
+  <div class="card">
+    <h3>Valores das Fases</h3>
+    <div class="row">
+      <div><label>Fase I — Diagnóstico</label><input type="text" data-field="contrato.valor.fase1" value="R$ 1.200,00"></div>
+      <div><label>Fase II — Arquitetura Completa</label><input type="text" data-field="contrato.valor.fase2" value="R$ 4.000,00"></div>
+      <div><label>Fase III — Seleção Counsel</label><input type="text" data-field="contrato.valor.fase3" value="R$ 2.000,00"></div>
+      <div><label>Fase IV — Retainer</label><input type="text" data-field="contrato.valor.fase4" value="R$ 2.000,00/mês"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Status do Contrato</h3>
+    <select data-field="contrato.status">
+      <option value="rascunho">📝 Rascunho</option>
+      <option value="enviado">📤 Enviado</option>
+      <option value="assinado">✅ Assinado</option>
+      <option value="arquivado">📦 Arquivado</option>
+    </select>
+    <div class="row">
+      <div><label>Data de Envio</label><input type="date" data-field="contrato.dataEnvio"></div>
+      <div><label>Data de Assinatura</label><input type="date" data-field="contrato.dataAssinatura"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Ações</h3>
+    <button class="btn" onclick="visualizarContrato()">👁️ Visualizar</button>
+    <button class="btn btn-outline" onclick="baixarContratoPDF()">📥 Baixar PDF</button>
+    <button class="btn btn-outline" onclick="imprimirContrato()">🖨️ Imprimir</button>
+  </div>
+  <div class="card" id="preview-contrato" style="display:none;">
+    <h3>Pré-visualização</h3>
+    <div id="contrato-conteudo"></div>
+  </div>
+</div>
+
+<!-- ══════════ 12. PAGAMENTOS ══════════ -->
+<div class="tab-content" id="tab-pagamentos">
+  <span class="badge">Operacional</span>
+  <h1>Pagamentos</h1>
+  <p class="subtitle">Controle financeiro — RPA, INSS, ISS, valor líquido, comprovantes.</p>
+  <div class="card">
+    <h3>Alíquotas do Contador</h3>
+    <div class="row">
+      <div><label>Alíquota INSS (%)</label><input type="number" data-field="pagamento.aliquota.inss" placeholder="11" step="0.01"></div>
+      <div><label>Alíquota ISS (%)</label><input type="number" data-field="pagamento.aliquota.iss" placeholder="5" step="0.01"></div>
+    </div>
+  </div>
+  <div id="pagamentos-container"></div>
+  <button class="btn" onclick="adicionarPagamento()">+ Adicionar Pagamento</button>
+  <div class="card" style="margin-top:2rem;">
+    <h3>Consolidado</h3>
+    <div id="pagamentos-consolidado"></div>
+    <button class="btn btn-outline" onclick="exportarPagamentosCSV()">📥 Exportar CSV</button>
+  </div>
+</div>
+
+<!-- ══════════ 13. ASSINATURA ══════════ -->
+<div class="tab-content" id="tab-assinatura">
+  <span class="badge">Operacional</span>
+  <h1>Assinatura Digital</h1>
+  <p class="subtitle">Gestão de assinatura eletrônica via gov.br, com upload do PDF assinado.</p>
+  <div class="card">
+    <h3>Como funciona</h3>
+    <ol style="font-size:0.85rem; padding-left:1.5rem;">
+      <li>Gere o PDF do contrato na aba <strong>Contrato</strong> (botão "Baixar PDF")</li>
+      <li>Acesse <a href="https://assinatura.gov.br" target="_blank" style="color:var(--gold);">assinatura.gov.br</a></li>
+      <li>Faça upload do PDF e adicione os assinantes</li>
+      <li>Cada parte assina com sua conta gov.br (nível prata ou ouro)</li>
+      <li>Baixe o PDF assinado e faça upload aqui</li>
+    </ol>
+    <button class="btn" onclick="window.open('https://assinatura.gov.br','_blank')">🔐 Abrir assinatura.gov.br</button>
+  </div>
+  <div id="assinaturas-container"></div>
+  <button class="btn" onclick="adicionarAssinatura()">+ Adicionar Documento</button>
+</div>
+
+<!-- ══════════ 14. MÍDIAS ══════════ -->
+<div class="tab-content" id="tab-midias">
+  <span class="badge">Operacional</span>
+  <h1>Mídias do Caso</h1>
+  <p class="subtitle">Áudios, vídeos, imagens e PDFs armazenados no Cloudflare R2.</p>
+  <div class="card">
+    <h3>Como funciona</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">
+      Arquivos são enviados diretamente para o R2. Vídeos podem ser convertidos para H.264 no navegador.
+      No painel, apenas metadados ficam salvos.
+    </p>
+  </div>
+  <div class="card">
+    <h3>Upload de Arquivo Único</h3>
+    <label>Tipo</label>
+    <select id="midia-tipo">
+      <option value="">—</option>
+      <option>🎙️ Áudio</option>
+      <option>🎥 Vídeo</option>
+      <option>📷 Imagem</option>
+      <option>📄 PDF</option>
+    </select>
+    <label>Descrição</label>
+    <input type="text" id="midia-desc" placeholder="Ex: Áudio da reunião de assembleia">
+    <label>Evento-ID (opcional)</label>
+    <input type="text" id="midia-evento" placeholder="Ex: E01">
+    <label>Tipo de Evidência</label>
+    <select id="midia-tipo-evidencia">
+      <option value="">—</option>
+      <option>visual</option>
+      <option>áudio</option>
+      <option>comportamento</option>
+      <option>dano</option>
+      <option>presença</option>
+      <option>contexto</option>
+    </select>
+    <label>Integridade</label>
+    <select id="midia-integridade">
+      <option value="">—</option>
+      <option>original</option>
+      <option>cópia</option>
+      <option>editado</option>
+      <option>desconhecido</option>
+    </select>
+    <label>Correlação (BO, doc, testemunha ou vídeo)</label>
+    <input type="text" id="midia-correlacao" placeholder="Ex: BO SS1682/2025, V003, Valtenis">
+    <label>Arquivo</label>
+    <input type="file" id="midia-file" accept="audio/*,video/*,image/*,application/pdf">
+    <button class="btn" onclick="enviarMidia()" style="margin-top:1rem;">📤 Enviar Arquivo</button>
+  </div>
+  <div class="card">
+    <h3>Upload de Pasta Inteira</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">
+      Selecione uma pasta. Todos os arquivos serão enviados preservando a estrutura.
+    </p>
+    <label>Pasta</label>
+    <input type="file" id="midia-pasta" webkitdirectory directory multiple>
+    <label style="display:flex; align-items:center; gap:0.4rem; text-transform:none; letter-spacing:0; font-size:0.82rem; margin-top:0.8rem;">
+      <input type="checkbox" id="midia-pasta-converter" style="width:auto; accent-color:var(--gold);">
+      Converter vídeos para H.264 antes do envio
+    </label>
+    <button class="btn" onclick="enviarPasta()" style="margin-top:1rem;">📁 Enviar Pasta</button>
+  </div>
+  <div class="card" id="midia-progresso-box" style="display:none;">
+    <h3>Progresso do Upload</h3>
+    <p id="midia-progresso-geral" style="font-size:0.85rem;"></p>
+    <progress id="midia-progresso-bar" value="0" max="100" style="width:100%; height:10px; margin-top:0.5rem;"></progress>
+    <p id="midia-progresso-text" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.5rem;"></p>
+    <div id="midia-lista-arquivos" style="margin-top:1rem; max-height:300px; overflow-y:auto; font-size:0.8rem;"></div>
+    <button class="btn btn-outline" id="midia-cancelar" onclick="cancelarUpload()" style="display:none; margin-top:1rem; border-color:#c97a4c; color:#c97a4c;">✕ Cancelar Upload</button>
+  </div>
+  <h2>Arquivos Enviados</h2>
+  <div id="midias-container"></div>
+</div>
+
+<!-- ══════════ 15. EVENTOS ══════════ -->
+<div class="tab-content" id="tab-eventos">
+  <span class="badge">Estratégico</span>
+  <h1>Matriz de Eventos</h1>
+  <p class="subtitle">Cada evento reúne vídeos, documentos, testemunhas e lacunas.</p>
+  <div class="card">
+    <h3>Como funciona</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted);">
+      O Evento é o eixo central que amarra: vídeos, documentos, testemunhas, o que está demonstrado,
+      o que NÃO está demonstrado, e a questão para o advogado.
+    </p>
+  </div>
+  <div id="eventos-container"></div>
+  <button class="btn" onclick="adicionarEvento()">+ Adicionar Evento</button>
+</div>
+
+</main>
+
+<div class="status-bar">
+  <span id="status-text">Aguardando preenchimento...</span>
+  <span id="status-time"></span>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'lss_dados_v4';
+const WORKER_URL = 'https://edificiocondessa-r2.leconciergedubrasil.workers.dev';
+const AUTH_TOKEN = 'solomon1975!';
+const SENHA_APAGAR = '1975';
+
+function carregarDados() {
+  const d = localStorage.getItem(STORAGE_KEY);
+  return d ? JSON.parse(d) : {};
+}
+
+function salvarDados(dados) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    atualizarStatus('salvo');
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      alert('Limite de armazenamento local atingido. Exporte o JSON e limpe dados antigos.');
+    } else {
+      console.error(e);
+    }
+  }
+}
+
+function atualizarStatus(tipo) {
+  const el = document.getElementById('status-text');
+  const time = document.getElementById('status-time');
+  const agora = new Date().toLocaleTimeString('pt-BR');
+  if (tipo === 'salvo') { el.textContent = '✓ Dados salvos automaticamente'; el.className = 'saved'; }
+  else if (tipo === 'alterado') { el.textContent = '● Alterações pendentes...'; el.className = 'unsaved'; }
+  time.textContent = agora;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROTEÇÃO POR SENHA
+// ═══════════════════════════════════════════════════════════════
+function pedirSenha(acao) {
+  const senha = prompt(`🔒 Confirmação de segurança\n\nAção: ${acao}\n\nDigite a senha para confirmar:`);
+  if (senha === null) return false;
+  if (senha !== SENHA_APAGAR) {
+    alert('❌ Senha incorreta. Ação cancelada.');
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (btn.dataset.tab === 'painel') { atualizarStatusFormularios(); atualizarResumoFinanceiro(); }
+    if (btn.dataset.tab === 'pagamentos') atualizarConsolidado();
+    if (btn.dataset.tab === 'midias') renderizarMidias();
+    if (btn.dataset.tab === 'inventario') renderizarInventario();
+    if (btn.dataset.tab === 'eventos') renderizarEventos();
+if (btn.dataset.tab === 'indexacao') renderizarIndexacao();
+if (btn.dataset.tab === 'plano') renderizarPlano();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// AUTO-SAVE
+// ═══════════════════════════════════════════════════════════════
+let timeoutSalvar;
+function bindAutoSave(input) {
+  const dados = carregarDados();
+  const field = input.dataset.field;
+  if (dados[field] !== undefined) {
+    if (input.type === 'checkbox') input.checked = dados[field];
+    else input.value = dados[field];
+  }
+  const evento = input.type === 'checkbox' ? 'change' : 'input';
+  input.addEventListener(evento, () => {
+    atualizarStatus('alterado');
+    clearTimeout(timeoutSalvar);
+    timeoutSalvar = setTimeout(() => {
+      const d = carregarDados();
+      d[field] = input.type === 'checkbox' ? input.checked : input.value;
+      salvarDados(d);
+    }, 600);
+  });
+}
+document.querySelectorAll('[data-field]').forEach(bindAutoSave);
+
+// ═══════════════════════════════════════════════════════════════
+// HASH SHA-256
+// ═══════════════════════════════════════════════════════════════
+async function hashFile(file) {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REMOVER BLOCO
+// ═══════════════════════════════════════════════════════════════
+function removerBloco(btn) {
+  if (confirm('Remover este bloco?')) { btn.closest('.card').remove(); atualizarStatus('alterado'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROTOCOLO F1–F10
+// ═══════════════════════════════════════════════════════════════
+let incidenteCount = 0;
+function adicionarIncidente() {
+  incidenteCount++;
+  const id = incidenteCount;
+  const container = document.getElementById('protocolo-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.incidente = id;
+  div.innerHTML = `
+    <h3>Incidente #${id}</h3>
+    <div class="row">
+      <div><label>F1 — Data</label><input type="date" data-field="protocolo.${id}.data"></div>
+      <div><label>F1 — Hora</label><input type="time" data-field="protocolo.${id}.hora"></div>
+    </div>
+    <label>F2 — Quem estava envolvido</label><input type="text" data-field="protocolo.${id}.quem">
+    <label>F3 — Onde aconteceu</label><input type="text" data-field="protocolo.${id}.onde">
+    <label>F4 — O que aconteceu</label><textarea data-field="protocolo.${id}.oque"></textarea>
+    <label>F5 — Houve ameaça?</label>
+    <select data-field="protocolo.${id}.ameaca"><option value="">—</option><option>Não</option><option>Sim — verbal</option><option>Sim — escrita</option><option>Sim — implícita</option></select>
+    <label>F6 — Houve agressão física?</label>
+    <select data-field="protocolo.${id}.agressao"><option value="">—</option><option>Não</option><option>Empurrão</option><option>Soco</option><option>Chute</option><option>Outro</option></select>
+    <h4>📎 ANEXOS — F6 (Fotos/Vídeos de Lesão)</h4>
+    <input type="file" id="anexo-f6-${id}" accept="image/*,video/*" multiple onchange="anexarArquivos(${id}, 'F6', event)">
+    <div id="anexos-f6-${id}" style="margin-top:0.5rem;"></div>
+    <label>F7 — Houve atendimento médico?</label><input type="text" data-field="protocolo.${id}.medico">
+    <label>F7 — Número do BO (se houver)</label><input type="text" data-field="protocolo.${id}.boNumeroF7">
+    <h4>📎 ANEXOS — F7 (Laudo Médico + PDF do BO)</h4>
+    <input type="file" id="anexo-f7-${id}" accept="application/pdf,image/*" multiple onchange="anexarArquivos(${id}, 'F7', event)">
+    <div id="anexos-f7-${id}" style="margin-top:0.5rem;"></div>
+    <label>F8 — Existe BO?</label><input type="text" data-field="protocolo.${id}.bo">
+    <div class="row">
+      <div><label>Número do BO</label><input type="text" data-field="protocolo.${id}.boNumero"></div>
+      <div><label>Data do Registro</label><input type="date" data-field="protocolo.${id}.boData"></div>
+      <div><label>Delegacia</label><input type="text" data-field="protocolo.${id}.boDelegacia"></div>
+    </div>
+    <h4>📎 ANEXOS — F8 (PDF do BO)</h4>
+    <input type="file" id="anexo-f8-${id}" accept="application/pdf,image/*" multiple onchange="anexarArquivos(${id}, 'F8', event)">
+    <div id="anexos-f8-${id}" style="margin-top:0.5rem;"></div>
+    <label>F9 — Testemunhas</label><input type="text" data-field="protocolo.${id}.testemunhas">
+    <div class="row">
+      <div><label>Contato</label><input type="text" data-field="protocolo.${id}.testemunhaContato"></div>
+      <div><label>Disponibilidade</label><select data-field="protocolo.${id}.testemunhaDisponibilidade"><option value="">—</option><option>Disposto a depor</option><option>Indeciso</option><option>Recusa</option></select></div>
+    </div>
+    <h4>📎 ANEXOS — F9 (Documentos)</h4>
+    <input type="file" id="anexo-f9-${id}" accept="application/pdf,image/*" multiple onchange="anexarArquivos(${id}, 'F9', event)">
+    <div id="anexos-f9-${id}" style="margin-top:0.5rem;"></div>
+    <label>F10 — Câmera / Áudio / Mensagem / Vídeo</label><input type="text" data-field="protocolo.${id}.midia">
+    <div class="row">
+      <div><label>Tipo de Mídia</label><select data-field="protocolo.${id}.tipoMidia"><option value="">—</option><option>CFTV</option><option>Áudio</option><option>Mensagem</option><option>Vídeo</option><option>Outro</option></select></div>
+      <div><label>Controlador</label><input type="text" data-field="protocolo.${id}.controladorFonte"></div>
+    </div>
+    <h4>📎 ANEXOS — F10</h4>
+    <label>Upload de Arquivo</label>
+    <input type="file" id="anexo-f10-${id}" accept="video/*,audio/*,image/*,application/pdf" multiple onchange="anexarArquivos(${id}, 'F10', event)">
+    <label style="margin-top:0.5rem;">Upload de Pasta</label>
+    <input type="file" id="anexo-f10-pasta-${id}" webkitdirectory directory multiple onchange="anexarPasta(${id}, 'F10', event)">
+    <div id="anexos-f10-${id}" style="margin-top:0.5rem;"></div>
+    <button class="btn btn-outline btn-sm" style="margin-top:1rem" onclick="removerIncidenteProtegido(this)">Remover Incidente</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+  setTimeout(() => {
+    ['F6','F7','F8','F9','F10'].forEach(c => restaurarAnexos(id, c));
+  }, 100);
+}
+
+function removerIncidenteProtegido(btn) {
+  const card = btn.closest('.card');
+  const incidenteId = card?.dataset?.incidente;
+  if (!pedirSenha('Remover incidente inteiro')) return;
+  if (incidenteId) {
+    const dados = carregarDados();
+    Object.keys(dados)
+      .filter(k => k.startsWith('anexo.') && k.endsWith('.incidente'))
+      .map(k => k.split('.')[1])
+      .filter(id => String(dados['anexo.' + id + '.incidente']) === String(incidenteId))
+      .forEach(id => {
+        ['incidente', 'campo', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key', 'tipo'].forEach(c => {
+          delete dados['anexo.' + id + '.' + c];
+        });
+      });
+    salvarDados(dados);
+  }
+  if (confirm('Remover este incidente do painel?')) {
+    card.remove();
+    atualizarStatus('alterado');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANEXOS DO PROTOCOLO
+// ═══════════════════════════════════════════════════════════════
+async function anexarArquivos(incidenteId, campo, event) {
+  const files = Array.from(event.target.files);
+  if (files.length === 0) return;
+  for (const file of files) {
+    if (file.size > 100 * 1024 * 1024) { alert(`Arquivo ${file.name} ultrapassa 100 MB.`); continue; }
+    await enviarAnexo(incidenteId, campo, file);
+  }
+  event.target.value = '';
+  restaurarAnexos(incidenteId, campo);
+}
+
+async function anexarPasta(incidenteId, campo, event) {
+  const files = Array.from(event.target.files);
+  if (files.length === 0) return;
+  const validos = files.filter(f => {
+    const t = f.type || '';
+    return t.startsWith('audio/') || t.startsWith('video/') || t.startsWith('image/') || t === 'application/pdf';
+  });
+  if (validos.length === 0) { alert('A pasta não contém arquivos válidos.'); return; }
+  if (!confirm(`Enviar ${validos.length} arquivo(s)?`)) return;
+  let enviados = 0;
+  for (const file of validos) {
+    if (file.size > 100 * 1024 * 1024) continue;
+    await enviarAnexo(incidenteId, campo, file);
+    enviados++;
+  }
+  alert(`${enviados} de ${validos.length} arquivos enviados.`);
+  event.target.value = '';
+  restaurarAnexos(incidenteId, campo);
+}
+
+async function enviarAnexo(incidenteId, campo, file) {
+  const timestamp = Date.now();
+  const nomeLimpo = file.name.replace(/\s+/g, '-').toLowerCase();
+  const caminhoRelativo = file.webkitRelativePath || '';
+  const caminhoLimpo = caminhoRelativo.replace(/\s+/g, '-').toLowerCase();
+  const key = caminhoLimpo
+    ? `protocolo/incidente-${incidenteId}/${campo.toLowerCase()}/pasta/${timestamp}-${caminhoLimpo}`
+    : `protocolo/incidente-${incidenteId}/${campo.toLowerCase()}/${timestamp}-${nomeLimpo}`;
+  try {
+    const hash = await hashFile(file);
+    const resp = await fetch(`${WORKER_URL}/${key}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${AUTH_TOKEN}`, 'Content-Type': file.type || 'application/octet-stream' },
+      body: file
+    });
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const dados = carregarDados();
+    const anexoId = `${incidenteId}_${campo}_${timestamp}`;
+    dados['anexo.' + anexoId + '.incidente'] = incidenteId;
+    dados['anexo.' + anexoId + '.campo'] = campo;
+    dados['anexo.' + anexoId + '.nome'] = file.name;
+    dados['anexo.' + anexoId + '.caminho'] = caminhoRelativo || file.name;
+    dados['anexo.' + anexoId + '.tamanho'] = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    dados['anexo.' + anexoId + '.data'] = new Date().toISOString().slice(0, 10);
+    dados['anexo.' + anexoId + '.hash'] = hash;
+    dados['anexo.' + anexoId + '.key'] = key;
+    dados['anexo.' + anexoId + '.tipo'] = file.type;
+    salvarDados(dados);
+  } catch (err) { alert(`Erro ao enviar ${file.name}: ${err.message}`); }
+}
+
+function restaurarAnexos(incidenteId, campo) {
+  const dados = carregarDados();
+  const container = document.getElementById(`anexos-${campo.toLowerCase()}-${incidenteId}`);
+  if (!container) return;
+  const anexos = Object.keys(dados)
+    .filter(k => k.startsWith('anexo.') && k.endsWith('.nome'))
+    .map(k => k.split('.')[1])
+    .filter(id => dados['anexo.' + id + '.incidente'] === incidenteId && dados['anexo.' + id + '.campo'] === campo);
+  if (anexos.length === 0) { container.innerHTML = '<p style="font-size:0.75rem; color:var(--text-muted);">Nenhum anexo.</p>'; return; }
+  let html = '<table style="font-size:0.75rem;"><tr><th>Arquivo</th><th>Tamanho</th><th>Hash</th><th>Ações</th></tr>';
+  anexos.forEach(id => {
+    const nome = dados['anexo.' + id + '.nome'] || '';
+    const tamanho = dados['anexo.' + id + '.tamanho'] || '';
+    const hash = dados['anexo.' + id + '.hash'] || '';
+    const key = dados['anexo.' + id + '.key'] || '';
+    html += `<tr>
+      <td>${nome}</td>
+      <td>${tamanho}</td>
+      <td style="font-family:monospace; font-size:0.6rem;">${hash.substring(0, 16)}…</td>
+      <td>
+        <button class="btn btn-sm" onclick="abrirMidia('${key}')">👁️</button>
+        <button class="btn btn-outline btn-sm" onclick="baixarMidia('${key}', '${nome}')">📥</button>
+        <button class="btn btn-outline btn-sm" onclick="removerAnexo('${id}', ${incidenteId}, '${campo}')" style="border-color:#c97a4c; color:#c97a4c;">🗑️</button>
+      </td></tr>`;
+  });
+  html += '</table>';
+  container.innerHTML = html;
+}
+
+function removerAnexo(anexoId, incidenteId, campo) {
+  const dados = carregarDados();
+  const nome = dados['anexo.' + anexoId + '.nome'] || 'anexo';
+  if (!pedirSenha(`Remover anexo: ${nome}`)) return;
+  if (!confirm('Remover este anexo do painel?')) return;
+  ['incidente', 'campo', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key', 'tipo'].forEach(c => {
+    delete dados['anexo.' + anexoId + '.' + c];
+  });
+  salvarDados(dados);
+  restaurarAnexos(incidenteId, campo);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INVENTÁRIO
+// ═══════════════════════════════════════════════════════════════
+let invCount = 0;
+async function adicionarDocumentoAvulso() {
+  const tipo = document.getElementById('inv-tipo').value;
+  const desc = document.getElementById('inv-desc').value;
+  const controlador = document.getElementById('inv-controlador').value;
+  const estado = document.getElementById('inv-estado').value;
+  const fileInput = document.getElementById('inv-file');
+  const pastaInput = document.getElementById('inv-pasta');
+  const arquivos = [];
+  if (fileInput.files.length > 0) arquivos.push(...Array.from(fileInput.files));
+  if (pastaInput.files.length > 0) arquivos.push(...Array.from(pastaInput.files));
+  if (!tipo) { alert('Selecione o tipo.'); return; }
+  if (arquivos.length === 0) { alert('Selecione um arquivo ou pasta.'); return; }
+  const validos = arquivos.filter(f => {
+    const t = f.type || '';
+    return t.startsWith('audio/') || t.startsWith('video/') || t.startsWith('image/') || t === 'application/pdf';
+  });
+  if (validos.length === 0) { alert('Nenhum arquivo válido.'); return; }
+  if (!confirm(`Adicionar ${validos.length} arquivo(s)?`)) return;
+  const progBox = document.getElementById('inv-progresso-box');
+  const progBar = document.getElementById('inv-progresso-bar');
+  const progText = document.getElementById('inv-progresso-text');
+  progBox.style.display = 'block';
+  let enviados = 0, falhados = 0;
+  for (let i = 0; i < validos.length; i++) {
+    const file = validos[i];
+    progText.textContent = `Enviando ${i + 1} de ${validos.length}: ${file.name}`;
+    progBar.value = Math.round((i / validos.length) * 100);
+    if (file.size > 100 * 1024 * 1024) { falhados++; continue; }
+    try {
+      const timestamp = Date.now() + '_' + i;
+      const nomeLimpo = file.name.replace(/\s+/g, '-').toLowerCase();
+      const caminhoRelativo = file.webkitRelativePath || '';
+      const caminhoLimpo = caminhoRelativo.replace(/\s+/g, '-').toLowerCase();
+      const key = caminhoLimpo ? `inventario/pasta/${timestamp}-${caminhoLimpo}` : `inventario/${timestamp}-${nomeLimpo}`;
+      const hash = await hashFile(file);
+      const resp = await fetch(`${WORKER_URL}/${key}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${AUTH_TOKEN}`, 'Content-Type': file.type || 'application/octet-stream' },
+        body: file
+      });
+      if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+      invCount++;
+      const id = `avulso_${timestamp}`;
+      const dados = carregarDados();
+      dados['inventario.' + id + '.tipo'] = tipo;
+      dados['inventario.' + id + '.descricao'] = desc;
+      dados['inventario.' + id + '.controlador'] = controlador;
+      dados['inventario.' + id + '.estado'] = estado;
+      dados['inventario.' + id + '.nome'] = file.name;
+      dados['inventario.' + id + '.caminho'] = caminhoRelativo || file.name;
+      dados['inventario.' + id + '.tamanho'] = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+      dados['inventario.' + id + '.data'] = new Date().toISOString().slice(0, 10);
+      dados['inventario.' + id + '.hash'] = hash;
+      dados['inventario.' + id + '.key'] = key;
+      dados['inventario.' + id + '.origem'] = 'avulso';
+      salvarDados(dados);
+      enviados++;
+    } catch (err) { falhados++; }
+  }
+  progBar.value = 100;
+  progText.textContent = `Concluído: ${enviados} enviados, ${falhados} falhados.`;
+  setTimeout(() => { progBox.style.display = 'none'; progBar.value = 0; }, 3000);
+  fileInput.value = ''; pastaInput.value = '';
+  document.getElementById('inv-desc').value = '';
+  document.getElementById('inv-controlador').value = '';
+  renderizarInventario();
+}
+
+function renderizarInventario() {
+  const dados = carregarDados();
+  const container = document.getElementById('inventario-container');
+  if (!container) return;
+  const filtroTipo = document.getElementById('inv-filtro-tipo')?.value || '';
+  const filtroIncidente = document.getElementById('inv-filtro-incidente')?.value || '';
+  const filtroInc = document.getElementById('inv-filtro-incidente');
+  if (filtroInc && filtroInc.options.length <= 1) {
+    const incidentes = new Set();
+    Object.keys(dados).forEach(k => {
+      if (k.startsWith('anexo.') && k.endsWith('.incidente')) incidentes.add(dados[k]);
+    });
+    Array.from(incidentes).sort((a, b) => a - b).forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n; opt.textContent = 'Incidente #' + n;
+      filtroInc.appendChild(opt);
+    });
+  }
+  const itens = [];
+  Object.keys(dados).filter(k => k.startsWith('anexo.') && k.endsWith('.nome')).map(k => k.split('.')[1]).forEach(id => {
+    const campo = dados['anexo.' + id + '.campo'];
+    const tipoMap = { 'F6': 'Fotos/Vídeos', 'F7': 'Laudo Médico', 'F8': 'BO', 'F9': 'Fotos/Vídeos', 'F10': 'Fotos/Vídeos' };
+    itens.push({
+      id: id, origem: 'protocolo', incidente: dados['anexo.' + id + '.incidente'], campo: campo,
+      tipo: tipoMap[campo] || 'Outro',
+      descricao: 'Anexo do incidente #' + dados['anexo.' + id + '.incidente'] + ' (' + campo + ')',
+      controlador: '', estado: '✅ Íntegro', nome: dados['anexo.' + id + '.nome'],
+      caminho: dados['anexo.' + id + '.caminho'] || '', tamanho: dados['anexo.' + id + '.tamanho'],
+      data: dados['anexo.' + id + '.data'], hash: dados['anexo.' + id + '.hash'],
+      key: dados['anexo.' + id + '.key']
+    });
+  });
+  Object.keys(dados).filter(k => k.startsWith('inventario.') && k.endsWith('.nome')).map(k => k.split('.')[1]).forEach(id => {
+    itens.push({
+      id: id, origem: 'avulso', incidente: null,
+      tipo: dados['inventario.' + id + '.tipo'] || 'Outro',
+      descricao: dados['inventario.' + id + '.descricao'] || '',
+      controlador: dados['inventario.' + id + '.controlador'] || '',
+      estado: dados['inventario.' + id + '.estado'] || '✅ Íntegro',
+      nome: dados['inventario.' + id + '.nome'],
+      caminho: dados['inventario.' + id + '.caminho'] || '',
+      tamanho: dados['inventario.' + id + '.tamanho'],
+      data: dados['inventario.' + id + '.data'],
+      hash: dados['inventario.' + id + '.hash'],
+      key: dados['inventario.' + id + '.key']
+    });
+  });
+  itens.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+  const filtrados = itens.filter(item => {
+    if (filtroTipo && item.tipo !== filtroTipo) return false;
+    if (filtroIncidente && String(item.incidente) !== String(filtroIncidente)) return false;
+    return true;
+  });
+  if (filtrados.length === 0) {
+    container.innerHTML = '<div class="card"><p style="color:var(--text-muted);">Nenhum documento encontrado.</p></div>';
+    return;
+  }
+  let html = '<div class="card"><p style="font-size:0.8rem; color:var(--text-muted);">Total: <strong>' + filtrados.length + '</strong> documento(s)</p><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Arquivo</th><th>Tamanho</th><th>Controlador</th><th>Estado</th><th>Hash</th><th>Ações</th></tr></thead><tbody>';
+  filtrados.forEach(item => {
+    const origemBadge = item.origem === 'protocolo'
+      ? '<span style="font-size:0.65rem; color:var(--gold);">Incidente #' + item.incidente + '</span>'
+      : '<span style="font-size:0.65rem; color:var(--text-muted);">Avulso</span>';
+    html += `<tr>
+      <td>${item.data || ''}<br>${origemBadge}</td>
+      <td>${item.tipo}</td>
+      <td>${item.descricao || ''}</td>
+      <td style="font-size:0.7rem; word-break:break-all;">${item.nome}</td>
+      <td>${item.tamanho}</td>
+      <td>${item.controlador}</td>
+      <td>${item.estado}</td>
+      <td style="font-family:monospace; font-size:0.6rem;">${(item.hash || '').substring(0, 12)}…</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm" onclick="abrirMidia('${item.key}')">👁️</button>
+        <button class="btn btn-outline btn-sm" onclick="baixarMidia('${item.key}', '${item.nome}')">📥</button>
+        <button class="btn btn-outline btn-sm" onclick="removerInventario('${item.id}', '${item.origem}')" style="border-color:#c97a4c; color:#c97a4c;">🗑️</button>
+      </td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+function removerInventario(id, origem) {
+  const dados = carregarDados();
+  const nome = dados['inventario.' + id + '.nome'] || dados['anexo.' + id + '.nome'] || 'documento';
+  if (!pedirSenha('Remover: ' + nome)) return;
+  if (!confirm('Remover este documento do painel?')) return;
+  if (origem === 'avulso') {
+    ['tipo', 'descricao', 'controlador', 'estado', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key', 'origem'].forEach(c => { delete dados['inventario.' + id + '.' + c]; });
+  } else if (origem === 'protocolo') {
+    ['incidente', 'campo', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key', 'tipo'].forEach(c => { delete dados['anexo.' + id + '.' + c]; });
+  }
+  salvarDados(dados);
+  renderizarInventario();
+}
+
+function exportarInventarioCSV() {
+  const dados = carregarDados();
+  let csv = 'Data;Origem;Incidente;Tipo;Descricao;Arquivo;Caminho;Tamanho;Controlador;Estado;Hash;Key\n';
+  Object.keys(dados).filter(k => k.startsWith('anexo.') && k.endsWith('.nome')).map(k => k.split('.')[1]).forEach(id => {
+    csv += (dados['anexo.' + id + '.data'] || '') + ';Protocolo;' + (dados['anexo.' + id + '.incidente'] || '') + ';' + (dados['anexo.' + id + '.campo'] || '') + ';;' + (dados['anexo.' + id + '.nome'] || '') + ';' + (dados['anexo.' + id + '.caminho'] || '') + ';' + (dados['anexo.' + id + '.tamanho'] || '') + ';;;' + (dados['anexo.' + id + '.hash'] || '') + ';' + (dados['anexo.' + id + '.key'] || '') + '\n';
+  });
+  Object.keys(dados).filter(k => k.startsWith('inventario.') && k.endsWith('.nome')).map(k => k.split('.')[1]).forEach(id => {
+    csv += (dados['inventario.' + id + '.data'] || '') + ';Avulso;;' + (dados['inventario.' + id + '.tipo'] || '') + ';' + (dados['inventario.' + id + '.descricao'] || '') + ';' + (dados['inventario.' + id + '.nome'] || '') + ';' + (dados['inventario.' + id + '.caminho'] || '') + ';' + (dados['inventario.' + id + '.tamanho'] || '') + ';' + (dados['inventario.' + id + '.controlador'] || '') + ';' + (dados['inventario.' + id + '.estado'] || '') + ';' + (dados['inventario.' + id + '.hash'] || '') + ';' + (dados['inventario.' + id + '.key'] || '') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'inventario-documental.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MATRIZ, CONTRADIÇÕES, PRESER
+// ═══════════════════════════════════════════════════════════════
+// MATRIZ, CONTRADIÇÕES, PRESERVAÇÃO, TESTEMUNHAS, LACUNAS, COUNSEL
+// ═══════════════════════════════════════════════════════════════
+
+// ── MATRIZ ──
+let epCount = 0;
+function adicionarEpisodioMatriz() {
+  epCount++;
+  const id = epCount;
+  const container = document.getElementById('matriz-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Episódio #${id}</h3>
+    <label>Fato Principal</label><input type="text" data-field="matriz.${id}.fato">
+    <div class="row">
+      <div><label>BO?</label><select data-field="matriz.${id}.bo"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+      <div><label>Médico?</label><select data-field="matriz.${id}.medico"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+      <div><label>CFTV?</label><select data-field="matriz.${id}.cftv"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>Áudio?</label><select data-field="matriz.${id}.audio"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+      <div><label>Mensagem?</label><select data-field="matriz.${id}.mensagem"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+      <div><label>Testemunha?</label><select data-field="matriz.${id}.testemunha"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+    </div>
+    <label>Status</label>
+    <select data-field="matriz.${id}.status">
+      <option value="">—</option>
+      <option>✅ Disponível</option>
+      <option>⏳ Em obtenção</option>
+      <option>⚠️ Em risco</option>
+      <option>❌ Perdida</option>
+    </select>
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ── CONTRADIÇÕES ──
+let ctrCount = 0;
+function adicionarContradicao() {
+  ctrCount++;
+  const id = ctrCount;
+  const container = document.getElementById('contradicoes-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Contradição #${id}</h3>
+    <label>Afirmação</label><input type="text" data-field="contradicoes.${id}.afirmacao">
+    <label>Fonte</label><input type="text" data-field="contradicoes.${id}.fonte">
+    <label>Conflito</label><textarea data-field="contradicoes.${id}.conflito"></textarea>
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ── PRESERVAÇÃO ──
+let presCount = 0;
+function adicionarPreservacao() {
+  presCount++;
+  const id = presCount;
+  const container = document.getElementById('preservacao-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Evidência #${id}</h3>
+    <label>Evidência</label><input type="text" data-field="preservacao.${id}.evidencia">
+    <label>Ação recomendada</label><input type="text" data-field="preservacao.${id}.acao">
+    <label>Status</label>
+    <select data-field="preservacao.${id}.status">
+      <option value="">—</option>
+      <option>✅ Feito</option>
+      <option>⏳ Pendente</option>
+      <option>⚠️ Urgente</option>
+    </select>
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ── TESTEMUNHAS ──
+let testCount = 0;
+function adicionarTestemunha() {
+  testCount++;
+  const id = testCount;
+  const container = document.getElementById('testemunhas-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Testemunha #${id}</h3>
+    <label>Nome</label><input type="text" data-field="testemunhas.${id}.nome">
+    <label>Contato</label><input type="text" data-field="testemunhas.${id}.contato">
+    <label>Disponibilidade</label>
+    <select data-field="testemunhas.${id}.disponibilidade">
+      <option value="">—</option>
+      <option>Disposto a depor</option>
+      <option>Indeciso</option>
+      <option>Recusa</option>
+    </select>
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ── LACUNAS ──
+let lacCount = 0;
+function adicionarLacuna() {
+  lacCount++;
+  const id = lacCount;
+  const container = document.getElementById('lacunas-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Lacuna #${id}</h3>
+    <label>O que não sabemos</label><textarea data-field="lacunas.${id}.naosabemos"></textarea>
+    <label>O que precisa ser localizado</label><input type="text" data-field="lacunas.${id}.localizar">
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ── COUNSEL ──
+let couCount = 0;
+function adicionarCriterioCounsel() {
+  couCount++;
+  const id = couCount;
+  const container = document.getElementById('counsel-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Critério #${id}</h3>
+    <label>Critério</label><input type="text" data-field="counsel.${id}.criterio">
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATUS DOS FORMULÁRIOS
+// ═══════════════════════════════════════════════════════════════
+function atualizarStatusFormularios() {
+  const dados = carregarDados();
+  const grupos = {
+    'Intake': 'intake.', 'Protocolo': 'protocolo.', 'Inventário': 'inventario.',
+    'Matriz': 'matriz.', 'Contradições': 'contradicoes.', 'Preservação': 'preservacao.',
+    'Testemunhas': 'testemunhas.', 'Lacunas': 'lacunas.', 'Executive': 'executive.',
+    'Counsel': 'counsel.', 'Contrato': 'contrato.', 'Pagamentos': 'pagamento.',
+    'Assinatura': 'assinatura.', 'Eventos': 'evento.'
+  };
+  const container = document.getElementById('status-formularios');
+  if (!container) return;
+  let html = '<table><tr><th>Formulário</th><th>Status</th></tr>';
+  for (const [nome, prefixo] of Object.entries(grupos)) {
+    const preenchidos = Object.keys(dados).filter(k => k.startsWith(prefixo) && dados[k] && !k.includes('Base64')).length;
+    html += '<tr><td>' + nome + '</td><td>' + (preenchidos > 0 ? '✅ ' + preenchidos + ' campos' : '⏳ vazio') + '</td></tr>';
+  }
+  html += '</table>';
+  container.innerHTML = html;
+}
+
+function atualizarResumoFinanceiro() {
+  const dados = carregarDados();
+  const el = document.getElementById('resumo-financeiro');
+  if (!el) return;
+  let total = 0;
+  for (let i = 1; i <= pagCount; i++) total += parseFloat(dados['pagamento.' + i + '.bruto']) || 0;
+  el.innerHTML = '<p><strong>Total recebido:</strong> R$ ' + total.toFixed(2) + '</p>';
+}
+// ═══════════════════════════════════════════════════════════════
+// CONTRATO
+// ═══════════════════════════════════════════════════════════════
+function gerarContratoHTML() {
+  const d = carregarDados();
+  const cliente = d['intake.cliente'] || '[Cliente]';
+  const representante = d['intake.representante'] || '[Representante]';
+  const email = d['intake.email'] || '[E-mail]';
+  const cpfConsultor = d['contrato.consultor.cpf'] || '[CPF]';
+  const telefone = d['contrato.consultor.telefone'] || '[Telefone]';
+  const emailConsultor = d['contrato.consultor.email'] || '[E-mail]';
+  const fase1 = d['contrato.valor.fase1'] || 'R$ 1.200,00';
+  const fase2 = d['contrato.valor.fase2'] || 'R$ 4.000,00';
+  const fase3 = d['contrato.valor.fase3'] || 'R$ 2.000,00';
+  const fase4 = d['contrato.valor.fase4'] || 'R$ 2.000,00/mês';
+  const dataHoje = new Date().toLocaleDateString('pt-BR');
+  return '<h1>DIAGNÓSTICO ESTRATÉGICO</h1>' +
+    '<p style="text-align:center; font-size:0.9rem; color:#555; margin-bottom:2rem;">Serviço de Arquitetura de Caso — Litigation Support Strategist</p>' +
+    '<p><strong>1. DADOS DA PROPOSTA</strong></p>' +
+    '<table style="width:100%; font-size:0.8rem; margin-bottom:1.5rem;">' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>Cliente</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + cliente + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>Representante</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + representante + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>E-mail</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + email + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>Consultor</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">Solomon Von Herclestein</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>CPF</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + cpfConsultor + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>Contato</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + telefone + ' | ' + emailConsultor + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;"><strong>Data</strong></td><td style="padding:0.3rem; border:1px solid #ccc;">' + dataHoje + '</td></tr>' +
+    '</table>' +
+    '<p><strong>2. SERVIÇO CONTRATADO</strong></p>' +
+    '<p>Diagnóstico Estratégico — Serviço de Arquitetura de Caso. Análise estratégica que transforma um conjunto desorganizado de fatos, documentos e provas em uma estrutura documentada, cronológica e verificável.</p>' +
+    '<p><strong>3. ESCOPO INCLUSO — FASE I</strong></p>' +
+    '<ul style="font-size:0.85rem;"><li>Reunião diagnóstica (90–120 minutos)</li><li>Reconstrução factual</li><li>Inventário documental</li><li>Matriz probatória preliminar</li><li>Mapa de testemunhas</li><li>Análise de lacunas e contradições</li><li>Dossiê Estratégico do Caso</li><li>Briefing executivo</li></ul>' +
+    '<p><strong>4. ESCOPO NÃO INCLUSO</strong></p>' +
+    '<p>Interpretação de lei, definição de tese jurídica, elaboração de petições, representação em juízo, participação em audiências, consultoria jurídica, cobrança de honorários advocatícios, indicação de advogado com comissão.</p>' +
+    '<p><strong>5. HONORÁRIOS</strong></p>' +
+    '<table style="width:100%; font-size:0.8rem; margin-bottom:1rem;">' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;">Fase I — Diagnóstico Estratégico</td><td style="padding:0.3rem; border:1px solid #ccc;">' + fase1 + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;">Fase II — Arquitetura Completa do Caso</td><td style="padding:0.3rem; border:1px solid #ccc;">' + fase2 + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;">Fase III — Apoio à Seleção de Counsel</td><td style="padding:0.3rem; border:1px solid #ccc;">' + fase3 + '</td></tr>' +
+    '<tr><td style="padding:0.3rem; border:1px solid #ccc;">Fase IV — Acompanhamento Estratégico</td><td style="padding:0.3rem; border:1px solid #ccc;">' + fase4 + '</td></tr>' +
+    '</table>' +
+    '<p><strong>6. PAGAMENTO — FASE I</strong></p>' +
+    '<p>Valor bruto: ' + fase1 + '. Forma: dinheiro em espécie, mediante emissão de RPA pelo Cliente. Retenções de INSS e ISS na fonte, conforme legislação aplicável. Pagamento antes da realização da reunião diagnóstica.</p>' +
+    '<p><strong>7. PRAZO</strong></p>' +
+    '<p>Reunião conforme data acordada. Entrega do Dossiê Estratégico: 5 a 7 dias úteis após a reunião.</p>' +
+    '<p><strong>8. NATUREZA DO SERVIÇO</strong></p>' +
+    '<p>Este serviço não compreende representação judicial, elaboração de petições, participação em audiências ou qualquer ato privativo de advocacia. Caso sejam necessárias medidas judiciais, o Cliente contratará diretamente advogado legalmente habilitado.</p>' +
+    '<p><strong>9. AUSÊNCIA DE GARANTIA DE RESULTADO</strong></p>' +
+    '<p>Este serviço tem natureza diagnóstica e estratégica. Não constitui promessa ou garantia de resultado.</p>' +
+    '<p><strong>10. CONFIDENCIALIDADE E LGPD</strong></p>' +
+    '<p>As informações, documentos e dados fornecidos pelo Cliente serão tratados de forma confidencial, em conformidade com a Lei nº 13.709/2018.</p>' +
+    '<p><strong>11. ENCERRAMENTO E RESCISÃO</strong></p>' +
+    '<p>Este serviço é autossuficiente. Caso o Cliente não contrate as fases posteriores, a relação comercial se encerra, sem reembolso.</p>' +
+    '<p><strong>12. ACEITE E ASSINATURA</strong></p>' +
+    '<p>Pelo presente, as partes concordam com os termos acima e contratam o Diagnóstico Estratégico nas condições estabelecidas.</p>' +
+    '<table style="width:100%; margin-top:3rem; font-size:0.8rem;"><tr>' +
+    '<td style="padding:1rem; border-top:1px solid #333; text-align:center; width:45%;">' + cliente + '<br><small>Assinatura do Síndico/Representante</small></td>' +
+    '<td style="width:10%;"></td>' +
+    '<td style="padding:1rem; border-top:1px solid #333; text-align:center; width:45%;">Solomon Von Herclestein<br><small>Litigation Support Strategist</small></td>' +
+    '</tr></table>' +
+    '<p style="text-align:center; margin-top:3rem; font-size:0.75rem; color:#666; font-style:italic;">"Antes de um caso ser litigado, ele precisa ser compreendido."</p>';
+}
+
+function visualizarContrato() {
+  const preview = document.getElementById('preview-contrato');
+  const conteudo = document.getElementById('contrato-conteudo');
+  conteudo.innerHTML = gerarContratoHTML();
+  preview.style.display = 'block';
+  preview.scrollIntoView({ behavior: 'smooth' });
+}
+
+function baixarContratoPDF() {
+  const conteudo = gerarContratoHTML();
+  const janela = window.open('', '_blank');
+  janela.document.write('<html><head><title>Contrato</title><style>body{font-family:Georgia,serif;padding:2cm;font-size:11pt;line-height:1.6;color:#111;max-width:800px;margin:auto;}h1{font-size:1.4rem;text-align:center;}table{width:100%;border-collapse:collapse;}td{padding:0.4rem;}ul{padding-left:1.5rem;}</style></head><body>' + conteudo + '</body></html>');
+  janela.document.close();
+  setTimeout(() => janela.print(), 500);
+}
+
+function imprimirContrato() { baixarContratoPDF(); }
+
+// ═══════════════════════════════════════════════════════════════
+// PAGAMENTOS
+// ═══════════════════════════════════════════════════════════════
+let pagCount = 0;
+function adicionarPagamento() {
+  pagCount++;
+  const id = pagCount;
+  const container = document.getElementById('pagamentos-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Pagamento #${id}</h3>
+    <div class="row">
+      <div><label>Data</label><input type="date" data-field="pagamento.${id}.data"></div>
+      <div><label>Fase</label><select data-field="pagamento.${id}.fase"><option value="">—</option><option>Fase I</option><option>Fase II</option><option>Fase III</option><option>Fase IV</option></select></div>
+    </div>
+    <label>Valor Bruto (R$)</label>
+    <input type="number" step="0.01" data-field="pagamento.${id}.bruto" onchange="recalcularPagamento(${id})">
+    <div class="row">
+      <div><label>Retenção INSS (R$)</label><input type="text" id="inss-${id}" readonly></div>
+      <div><label>Retenção ISS (R$)</label><input type="text" id="iss-${id}" readonly></div>
+      <div><label>Valor Líquido (R$)</label><input type="text" id="liquido-${id}" readonly></div>
+    </div>
+    <div class="row">
+      <div><label>Forma</label><select data-field="pagamento.${id}.forma"><option value="">—</option><option>Dinheiro</option><option>PIX</option><option>Transferência</option></select></div>
+      <div><label>RPA emitido?</label><select data-field="pagamento.${id}.rpa"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+      <div><label>Nº do RPA</label><input type="text" data-field="pagamento.${id}.numeroRPA"></div>
+    </div>
+    <label>Observações</label>
+    <textarea data-field="pagamento.${id}.obs"></textarea>
+    <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="removerBloco(this)">Remover Pagamento</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  setTimeout(() => recalcularPagamento(id), 100);
+}
+
+function recalcularPagamento(id) {
+  const dados = carregarDados();
+  const bruto = parseFloat(dados['pagamento.' + id + '.bruto']) || 0;
+  const inssPct = parseFloat(dados['pagamento.aliquota.inss']) || 0;
+  const issPct = parseFloat(dados['pagamento.aliquota.iss']) || 0;
+  const inss = bruto * (inssPct / 100);
+  const iss = bruto * (issPct / 100);
+  const liquido = bruto - inss - iss;
+  const inssEl = document.getElementById('inss-' + id);
+  const issEl = document.getElementById('iss-' + id);
+  const liqEl = document.getElementById('liquido-' + id);
+  if (inssEl) inssEl.value = 'R$ ' + inss.toFixed(2);
+  if (issEl) issEl.value = 'R$ ' + iss.toFixed(2);
+  if (liqEl) liqEl.value = 'R$ ' + liquido.toFixed(2);
+}
+
+function atualizarConsolidado() {
+  const dados = carregarDados();
+  let totalBruto = 0, totalINSS = 0, totalISS = 0;
+  const inssPct = parseFloat(dados['pagamento.aliquota.inss']) || 0;
+  const issPct = parseFloat(dados['pagamento.aliquota.iss']) || 0;
+  for (let i = 1; i <= pagCount; i++) {
+    const bruto = parseFloat(dados['pagamento.' + i + '.bruto']) || 0;
+    if (bruto > 0) { totalBruto += bruto; totalINSS += bruto * (inssPct / 100); totalISS += bruto * (issPct / 100); }
+  }
+  const totalLiquido = totalBruto - totalINSS - totalISS;
+  const el = document.getElementById('pagamentos-consolidado');
+  if (!el) return;
+  el.innerHTML = '<table><tr><th>Total Bruto</th><th>Total INSS</th><th>Total ISS</th><th>Total Líquido</th></tr><tr><td>R$ ' + totalBruto.toFixed(2) + '</td><td>R$ ' + totalINSS.toFixed(2) + '</td><td>R$ ' + totalISS.toFixed(2) + '</td><td><strong>R$ ' + totalLiquido.toFixed(2) + '</strong></td></tr></table>';
+}
+
+function exportarPagamentosCSV() {
+  const dados = carregarDados();
+  let csv = 'Data;Fase;Bruto\n';
+  for (let i = 1; i <= pagCount; i++) {
+    if (dados['pagamento.' + i + '.bruto']) csv += (dados['pagamento.' + i + '.data'] || '') + ';' + (dados['pagamento.' + i + '.fase'] || '') + ';' + (dados['pagamento.' + i + '.bruto'] || '') + '\n';
+  }
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pagamentos-lss.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ASSINATURA
+// ═══════════════════════════════════════════════════════════════
+let assCount = 0;
+function adicionarAssinatura() {
+  assCount++;
+  const id = assCount;
+  const container = document.getElementById('assinaturas-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `
+    <h3>Documento #${id}</h3>
+    <label>Nome</label><input type="text" data-field="assinatura.${id}.documento">
+    <label>Status</label>
+    <select data-field="assinatura.${id}.status">
+      <option value="">—</option>
+      <option>📝 Rascunho</option>
+      <option>📤 Enviado</option>
+      <option>✅ Assinado</option>
+      <option>📦 Arquivado</option>
+    </select>
+    <label>Assinantes</label><input type="text" data-field="assinatura.${id}.assinantes">
+    <button class="btn btn-outline btn-sm" style="margin-top:1rem;" onclick="removerBloco(this)">Remover</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MÍDIAS
+// ═══════════════════════════════════════════════════════════════
+let uploadAtivo = false;
+let uploadCancelado = false;
+
+async function enviarMidia() {
+  const tipo = document.getElementById('midia-tipo').value;
+  const desc = document.getElementById('midia-desc').value;
+  const evento = document.getElementById('midia-evento').value;
+  const tipoEv = document.getElementById('midia-tipo-evidencia').value;
+  const integridade = document.getElementById('midia-integridade').value;
+  const correlacao = document.getElementById('midia-correlacao').value;
+  const file = document.getElementById('midia-file').files[0];
+  if (!tipo) { alert('Selecione o tipo.'); return; }
+  if (!file) { alert('Selecione um arquivo.'); return; }
+  const progBox = document.getElementById('midia-progresso-box');
+  const progText = document.getElementById('midia-progresso-text');
+  progBox.style.display = 'block';
+  const timestamp = Date.now();
+  const key = 'media/' + timestamp + '-' + file.name.replace(/\s+/g, '-').toLowerCase();
+  try {
+    const hash = await hashFile(file);
+    const resp = await fetch(WORKER_URL + '/' + key, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN, 'Content-Type': file.type || 'application/octet-stream' },
+      body: file
+    });
+    if (!resp.ok) throw new Error('Erro ' + resp.status);
+    const id = timestamp;
+    const dados = carregarDados();
+    dados['midia.' + id + '.tipo'] = tipo;
+    dados['midia.' + id + '.descricao'] = desc;
+    dados['midia.' + id + '.evento'] = evento;
+    dados['midia.' + id + '.tipoEvidencia'] = tipoEv;
+    dados['midia.' + id + '.integridade'] = integridade;
+    dados['midia.' + id + '.correlacao'] = correlacao;
+    dados['midia.' + id + '.nome'] = file.name;
+    dados['midia.' + id + '.caminho'] = file.name;
+    dados['midia.' + id + '.tamanho'] = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    dados['midia.' + id + '.data'] = new Date().toISOString().slice(0, 10);
+    dados['midia.' + id + '.hash'] = hash;
+    dados['midia.' + id + '.key'] = key;
+    salvarDados(dados);
+    progText.textContent = '✓ Enviado!';
+    setTimeout(() => { progBox.style.display = 'none'; }, 2000);
+    document.getElementById('midia-file').value = '';
+    document.getElementById('midia-desc').value = '';
+    document.getElementById('midia-evento').value = '';
+    document.getElementById('midia-correlacao').value = '';
+    renderizarMidias();
+  } catch (err) { alert('Erro: ' + err.message); setTimeout(() => { progBox.style.display = 'none'; }, 3000); }
+}
+
+async function enviarPasta() {
+  const input = document.getElementById('midia-pasta');
+  const files = Array.from(input.files);
+  if (files.length === 0) { alert('Selecione uma pasta.'); return; }
+  const validos = files.filter(f => {
+    const t = f.type || '';
+    return t.startsWith('audio/') || t.startsWith('video/') || t.startsWith('image/') || t === 'application/pdf';
+  });
+  if (validos.length === 0) { alert('Nenhum arquivo válido.'); return; }
+  if (!confirm('Enviar ' + validos.length + ' arquivo(s)?')) return;
+  uploadAtivo = true;
+  uploadCancelado = false;
+  const progBox = document.getElementById('midia-progresso-box');
+  const progBar = document.getElementById('midia-progresso-bar');
+  const progText = document.getElementById('midia-progresso-text');
+  const progGeral = document.getElementById('midia-progresso-geral');
+  const btnCancelar = document.getElementById('midia-cancelar');
+  progBox.style.display = 'block';
+  btnCancelar.style.display = 'inline-block';
+  let enviados = 0, falhados = 0;
+  for (let i = 0; i < validos.length; i++) {
+    if (uploadCancelado) break;
+    const file = validos[i];
+    const caminho = file.webkitRelativePath || file.name;
+    progGeral.textContent = 'Enviando ' + (i + 1) + ' de ' + validos.length + '...';
+    progText.textContent = caminho;
+    progBar.value = Math.round((i / validos.length) * 100);
+    const caminhoLimpo = caminho.replace(/\s+/g, '-').toLowerCase();
+    const timestamp = Date.now() + '_' + i;
+    const key = 'media/pasta/' + timestamp + '-' + caminhoLimpo;
+    try {
+      const hash = await hashFile(file);
+      const resp = await fetch(WORKER_URL + '/' + key, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN, 'Content-Type': file.type || 'application/octet-stream' },
+        body: file
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const id = timestamp;
+      const dados = carregarDados();
+      const tipo = file.type.startsWith('audio/') ? '🎙️ Áudio' : file.type.startsWith('video/') ? '🎥 Vídeo' : file.type.startsWith('image/') ? '📷 Imagem' : '📄 PDF';
+      dados['midia.' + id + '.tipo'] = tipo;
+      dados['midia.' + id + '.descricao'] = 'Pasta: ' + (caminho.split('/')[0] || '');
+      dados['midia.' + id + '.nome'] = file.name;
+      dados['midia.' + id + '.caminho'] = caminho;
+      dados['midia.' + id + '.tamanho'] = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+      dados['midia.' + id + '.data'] = new Date().toISOString().slice(0, 10);
+      dados['midia.' + id + '.hash'] = hash;
+      dados['midia.' + id + '.key'] = key;
+      salvarDados(dados);
+      enviados++;
+    } catch (err) { falhados++; }
+  }
+  progBar.value = 100;
+  progGeral.textContent = 'Concluído: ' + enviados + ' enviados, ' + falhados + ' falhados.';
+  btnCancelar.style.display = 'none';
+  uploadAtivo = false;
+  renderizarMidias();
+  setTimeout(() => { progBox.style.display = 'none'; }, 5000);
+}
+
+function cancelarUpload() {
+  if (!uploadAtivo) return;
+  if (confirm('Cancelar o upload?')) uploadCancelado = true;
+}
+
+function renderizarMidias() {
+  const dados = carregarDados();
+  const container = document.getElementById('midias-container');
+  if (!container) return;
+  const ids = Object.keys(dados).filter(k => k.startsWith('midia.') && k.endsWith('.nome')).map(k => k.split('.')[1]).sort((a, b) => b - a);
+  if (ids.length === 0) { container.innerHTML = '<div class="card"><p style="color:var(--text-muted);">Nenhuma mídia enviada ainda.</p></div>'; return; }
+  const grupos = {};
+  ids.forEach(id => {
+    const caminho = dados['midia.' + id + '.caminho'] || dados['midia.' + id + '.nome'] || '';
+    let pastaRaiz = '(sem pasta)';
+    if (caminho.includes('/')) pastaRaiz = caminho.split('/')[0];
+    if (!grupos[pastaRaiz]) grupos[pastaRaiz] = [];
+    grupos[pastaRaiz].push({
+      id: id,
+      tipo: dados['midia.' + id + '.tipo'] || '',
+      descricao: dados['midia.' + id + '.descricao'] || '',
+      evento: dados['midia.' + id + '.evento'] || '',
+      tipoEvidencia: dados['midia.' + id + '.tipoEvidencia'] || '',
+      integridade: dados['midia.' + id + '.integridade'] || '',
+      correlacao: dados['midia.' + id + '.correlacao'] || '',
+      nome: dados['midia.' + id + '.nome'] || '',
+      caminho: caminho,
+      tamanho: dados['midia.' + id + '.tamanho'] || '',
+      data: dados['midia.' + id + '.data'] || '',
+      hash: dados['midia.' + id + '.hash'] || '',
+      key: dados['midia.' + id + '.key'] || ''
+    });
+  });
+  let html = '';
+  Object.keys(grupos).sort().forEach(pasta => {
+    const itens = grupos[pasta];
+    html += '<div class="card" style="border:1px solid var(--gold); background:rgba(201,168,76,0.04);">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">' +
+      '<h3 style="margin:0; color:var(--gold); font-size:0.9rem;">📁 ' + pasta + '</h3>' +
+      '<span style="font-size:0.75rem; color:var(--text-muted);">' + itens.length + ' arquivo(s)</span>' +
+      '</div>' +
+      '<div style="margin-top:0.6rem;">' +
+      '<button class="btn btn-outline btn-sm" onclick="removerPastaMidias(\'' + pasta.replace(/'/g, "\\'") + '\')" style="border-color:#c97a4c; color:#c97a4c;">🗑️ Remover pasta do painel</button>' +
+      '</div></div>';
+    itens.forEach(item => {
+      html += '<div class="card" style="margin-left:2rem;">' +
+        '<h3 style="margin-top:0;">' + item.tipo + ' ' + (item.descricao || '(sem descrição)') + '</h3>' +
+        (item.evento ? '<p style="font-size:0.8rem; color:var(--gold);"><strong>Evento:</strong> ' + item.evento + '</p>' : '') +
+        (item.tipoEvidencia ? '<p style="font-size:0.8rem; color:var(--text-muted);"><strong>Tipo de evidência:</strong> ' + item.tipoEvidencia + '</p>' : '') +
+        (item.integridade ? '<p style="font-size:0.8rem; color:var(--text-muted);"><strong>Integridade:</strong> ' + item.integridade + '</p>' : '') +
+        (item.correlacao ? '<p style="font-size:0.8rem; color:var(--text-muted);"><strong>Correlação:</strong> ' + item.correlacao + '</p>' : '') +
+        '<p style="font-size:0.85rem;"><strong>Arquivo:</strong> ' + item.nome + '</p>' +
+        (item.caminho && item.caminho !== item.nome ? '<p style="font-size:0.78rem; color:var(--text-muted);"><strong>Caminho:</strong> ' + item.caminho + '</p>' : '') +
+        '<p style="font-size:0.85rem;"><strong>Tamanho:</strong> ' + item.tamanho + '</p>' +
+        '<p style="font-size:0.85rem;"><strong>Data:</strong> ' + item.data + '</p>' +
+        '<p style="font-size:0.68rem; font-family:monospace; word-break:break-all; color:var(--gold);"><strong>SHA-256:</strong> ' + item.hash + '</p>' +
+        '<p style="font-size:0.68rem; color:var(--text-muted); font-family:monospace;">R2: ' + item.key + '</p>' +
+        '<button class="btn btn-sm" onclick="abrirMidia(\'' + item.key + '\')">👁️ Abrir</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="baixarMidia(\'' + item.key + '\', \'' + item.nome + '\')">📥 Baixar</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="removerMidia(\'' + item.id + '\')" style="border-color:#c97a4c; color:#c97a4c;">🗑️ Remover</button>' +
+        '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function abrirMidia(key) { window.open(WORKER_URL + '/' + key, '_blank'); }
+
+async function baixarMidia(key, nome) {
+  try {
+    const resp = await fetch(WORKER_URL + '/' + key, { headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN } });
+    if (!resp.ok) { alert('Erro ao baixar: ' + resp.status); return; }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) { alert('Erro de conexão: ' + err.message); }
+}
+
+function removerMidia(id) {
+  const dados = carregarDados();
+  const nome = dados['midia.' + id + '.nome'] || 'mídia';
+  if (!pedirSenha('Remover: ' + nome)) return;
+  if (!confirm('Remover esta mídia do painel?')) return;
+  ['tipo', 'descricao', 'evento', 'tipoEvidencia', 'integridade', 'correlacao', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key'].forEach(c => delete dados['midia.' + id + '.' + c]);
+  salvarDados(dados);
+  renderizarMidias();
+}
+
+function removerPastaMidias(pasta) {
+  if (!pedirSenha('Remover TODA a pasta: ' + pasta)) return;
+  const dados = carregarDados();
+  const ids = Object.keys(dados).filter(k => k.startsWith('midia.') && k.endsWith('.nome')).map(k => k.split('.')[1]).filter(id => {
+    const caminho = dados['midia.' + id + '.caminho'] || '';
+    return (caminho.includes('/') ? caminho.split('/')[0] : '(sem pasta)') === pasta;
+  });
+  if (ids.length === 0) { alert('Nenhuma mídia nesta pasta.'); return; }
+  if (!confirm('Remover ' + ids.length + ' mídia(s)?')) return;
+  ids.forEach(id => ['tipo', 'descricao', 'evento', 'tipoEvidencia', 'integridade', 'correlacao', 'nome', 'caminho', 'tamanho', 'data', 'hash', 'key'].forEach(c => delete dados['midia.' + id + '.' + c]));
+  salvarDados(dados);
+  renderizarMidias();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVENTOS
+// ═══════════════════════════════════════════════════════════════
+let eventoCount = 0;
+function adicionarEvento() {
+  eventoCount++;
+  const id = eventoCount;
+  const container = document.getElementById('eventos-container');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.evento = id;
+  div.innerHTML = `
+    <h3>Evento E${String(id).padStart(2, '0')}</h3>
+    <div class="row">
+      <div><label>Data</label><input type="date" data-field="evento.${id}.data"></div>
+      <div><label>Título</label><input type="text" data-field="evento.${id}.titulo" placeholder="Ex: Agressão Valtenis"></div>
+    </div>
+    <label>Descrição</label>
+    <textarea data-field="evento.${id}.descricao"></textarea>
+    <label>Vídeos Associados (IDs separados por vírgula)</label>
+    <input type="text" data-field="evento.${id}.videos" placeholder="Ex: V001, V002, V003">
+    <label>Documentos Correlatos</label>
+    <input type="text" data-field="evento.${id}.documentos" placeholder="Ex: BO SS1682/2025, Laudo IML 548611/2025">
+    <label>Testemunhas</label>
+    <input type="text" data-field="evento.${id}.testemunhas" placeholder="Ex: Valtenis, PM, Márcio">
+    <label>O que demonstra</label>
+    <textarea data-field="evento.${id}.demonstra"></textarea>
+    <label>O que NÃO demonstra</label>
+    <textarea data-field="evento.${id}.naoDemonstra"></textarea>
+    <label>Questão para o advogado</label>
+    <textarea data-field="evento.${id}.questao"></textarea>
+    <label>Status</label>
+    <select data-field="evento.${id}.status">
+      <option value="">—</option>
+      <option>✅ Fechado</option>
+      <option>⚠️ Em aberto</option>
+      <option>❌ Sem prova</option>
+    </select>
+    <button class="btn btn-outline btn-sm" style="margin-top:1rem" onclick="removerEventoProtegido(this)">Remover Evento</button>
+  `;
+  container.appendChild(div);
+  div.querySelectorAll('[data-field]').forEach(bindAutoSave);
+  atualizarStatus('alterado');
+}
+
+function removerEventoProtegido(btn) {
+  if (!pedirSenha('Remover evento')) return;
+  if (confirm('Remover este evento do painel?')) {
+    btn.closest('.card').remove();
+    atualizarStatus('alterado');
+  }
+}
+
+function renderizarEventos() {
+  const container = document.getElementById('eventos-container');
+  if (!container) return;
+  // Eventos são renderizados dinamicamente via adicionarEvento()
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORTAR / IMPORTAR / LIMPAR / SYNC
+// ═══════════════════════════════════════════════════════════════
+function exportarJSON() {
+  const dados = carregarDados();
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (dados['caso.nome'] || 'lss').replace(/\s+/g, '-').toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try { localStorage.setItem(STORAGE_KEY, e.target.result); location.reload(); }
+    catch (err) { alert('Erro: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function limparTudo() {
+  if (!pedirSenha('Apagar TODOS os dados do painel')) return;
+  if (confirm('Confirmar apagar tudo permanentemente?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+async function sincronizarNuvem() {
+  const dados = carregarDados();
+  const key = (dados['caso.nome'] || 'lss').replace(/\s+/g, '-').toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.json';
+  try {
+    const resp = await fetch(WORKER_URL + '/' + key, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados, null, 2)
+    });
+    if (resp.ok) alert('✓ Sincronizado: ' + key);
+    else if (resp.status === 401) alert('Erro 401: Token inválido.');
+    else alert('Erro: ' + resp.status);
+  } catch (err) { alert('Erro de conexão: ' + err.message); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INICIALIZAÇÃO
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    renderizarIndexacao();
+  renderizarPlano();atualizarStatusFormularios();
+  atualizarResumoFinanceiro();
+  atualizarStatus('salvo');
+  renderizarMidias();
+  renderizarInventario();
+});
+
+setInterval(() => {
+  atualizarStatusFormularios();
+  atualizarResumoFinanceiro();
+}, 3000);
+</script>
+// ═══════════════════════════════════════════════════════════════
+// ABA INDEXAÇÃO — 186 vídeos
+// ═══════════════════════════════════════════════════════════════
+
+const VIDEO_LIST = [
+  {id:'V001',arq:'MHDX_ch1_main_20251222133000_20251222133035.mp4',data:'2025-12-22',hora:'13:30:35',canal:'ch1',hash:'62b80440'},
+  {id:'V002',arq:'MHDX_ch2_main_20251222122000_20251222122243.mp4',data:'2025-12-22',hora:'12:22:43',canal:'ch2',hash:'627e4c3c'},
+  {id:'V003',arq:'MHDX_ch2_main_20251222133000_20251222133035.mp4',data:'2025-12-22',hora:'13:30:35',canal:'ch2',hash:'8b7c3fd4'},
+  {id:'V004',arq:'MHDX_ch3_main_20251222122000_20251222122002.mp4',data:'2025-12-22',hora:'12:20:02',canal:'ch3',hash:'9153d6d1'},
+  {id:'V005',arq:'MHDX_ch3_main_20251222122020_20251222122123.mp4',data:'2025-12-22',hora:'12:21:23',canal:'ch3',hash:'f6590082'}
+  // ... adicionar os 181 restantes aqui
+];
+
+function renderizarIndexacao() {
+  const container = document.getElementById('indexacao-container');
+  if (!container) return;
+  const filtroEvento = document.getElementById('idx-filtro-evento')?.value || '';
+  const filtroStatus = document.getElementById('idx-filtro-status')?.value || '';
+  const dados = carregarDados();
+  
+  const filtrados = VIDEO_LIST.filter(v => {
+    const ev = dados[`idx.${v.id}.evento`] || '';
+    const st = dados[`idx.${v.id}.status`] || 'pendente';
+    if (filtroEvento && ev !== filtroEvento) return false;
+    if (filtroStatus && st !== filtroStatus) return false;
+    return true;
+  });
+  
+  if (filtrados.length === 0) {
+    container.innerHTML = '<div class="card"><p style="color:var(--text-muted);">Nenhum vídeo encontrado.</p></div>';
+    return;
+  }
+  
+  let html = '<div class="card"><table><thead><tr><th>ID</th><th>Arquivo</th><th>Data</th><th>Canal</th><th>Evento</th><th>Pessoas</th><th>O que mostra</th><th>Status</th></tr></thead><tbody>';
+  filtrados.forEach(v => {
+    const ev = dados[`idx.${v.id}.evento`] || '';
+    const pessoas = dados[`idx.${v.id}.pessoas`] || '';
+    const desc = dados[`idx.${v.id}.descricao`] || '';
+    const st = dados[`idx.${v.id}.status`] || 'pendente';
+    html += `<tr>
+      <td>${v.id}</td>
+      <td style="font-size:0.7rem; word-break:break-all;">${v.arq}</td>
+      <td>${v.data}</td>
+      <td>${v.canal}</td>
+      <td><input type="text" data-field="idx.${v.id}.evento" value="${ev}" style="width:80px;"></td>
+      <td><input type="text" data-field="idx.${v.id}.pessoas" value="${pessoas}" style="width:120px;"></td>
+      <td><input type="text" data-field="idx.${v.id}.descricao" value="${desc}" style="width:200px;"></td>
+      <td>
+        <select data-field="idx.${v.id}.status" style="width:100px;">
+          <option value="pendente" ${st==='pendente'?'selected':''}>⏳</option>
+          <option value="visto" ${st==='visto'?'selected':''}>✅</option>
+          <option value="incompleto" ${st==='incompleto'?'selected':''}>⚠️</option>
+        </select>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+  container.querySelectorAll('[data-field]').forEach(bindAutoSave);
+}
+
+function exportarIndexacaoCSV() {
+  const dados = carregarDados();
+  let csv = 'IDX,ARQUIVO,DATA,HORA,CANAL,EVENTO,PESSOAS,DESCRICAO,STATUS,HASH\n';
+  VIDEO_LIST.forEach(v => {
+    csv += `${v.id},${v.arq},${v.data},${v.hora},${v.canal},`;
+    csv += `${dados[`idx.${v.id}.evento`]||''},`;
+    csv += `${dados[`idx.${v.id}.pessoas`]||''},`;
+    csv += `${dados[`idx.${v.id}.descricao`]||''},`;
+    csv += `${dados[`idx.${v.id}.status`]||'pendente'},`;
+    csv += `${v.hash}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `indexacao_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ABA PLANO — Progresso
+// ═══════════════════════════════════════════════════════════════
+
+function renderizarPlano() {
+  const dados = carregarDados();
+  
+  const fase1 = VIDEO_LIST.filter(v => v.data === '2025-12-22');
+  const fase2 = VIDEO_LIST.filter(v => v.data === '2026-05-29');
+  const fase3 = VIDEO_LIST.filter(v => v.data !== '2025-12-22' && v.data !== '2026-05-29');
+  
+  const cont = arr => {
+    let vistos = 0, total = arr.length;
+    arr.forEach(v => { if (dados[`idx.${v.id}.status`] === 'visto') vistos++; });
+    return {vistos, total, pct: total > 0 ? Math.round((vistos/total)*100) : 0};
+  };
+  
+  const c1 = cont(fase1), c2 = cont(fase2), c3 = cont(fase3);
+  const total = c1.total + c2.total + c3.total;
+  const totalVistos = c1.vistos + c2.vistos + c3.vistos;
+  const totalPct = total > 0 ? Math.round((totalVistos/total)*100) : 0;
+  
+  document.getElementById('plano-progresso').innerHTML = `
+    <p><strong>${totalVistos} de ${total} vídeos vistos (${totalPct}%)</strong></p>
+    <progress value="${totalVistos}" max="${total}" style="width:100%; height:20px;"></progress>
+  `;
+  
+  const renderFase = (c, id) => {
+    document.getElementById(id).innerHTML = `
+      <p>${c.vistos} de ${c.total} vídeos (${c.pct}%)</p>
+      <progress value="${c.vistos}" max="${c.total}" style="width:100%; height:12px;"></progress>
+    `;
+  };
+  
+  renderFase(c1, 'plano-fase1');
+  renderFase(c2, 'plano-fase2');
+  renderFase(c3, 'plano-fase3');
+  
+  const checklist = [
+    'E01 visualizado',
+    'E02 visualizado',
+    'Anotações consolidadas',
+    'Correlação BO/Vídeo',
+    'Contradições identificadas',
+    'Lacunas mapeadas',
+    'Testemunhas confirmadas',
+    'Planilha preenchida (80%+)'
+  ];
+  let html = '';
+  checklist.forEach((item, i) => {
+    const val = dados[`plano.check.${i}`] || false;
+    html += `<label style="display:flex; align-items:center; gap:0.5rem; margin:0.5rem 0; text-transform:none; letter-spacing:0; color:var(--text);">
+      <input type="checkbox" data-field="plano.check.${i}" ${val?'checked':''} style="width:auto; accent-color:var(--gold);">
+      ${item}
+    </label>`;
+  });
+  document.getElementById('plano-checklist').innerHTML = html;
+  document.querySelectorAll('#plano-checklist [data-field]').forEach(bindAutoSave);
+}
+</body>
+</html>
