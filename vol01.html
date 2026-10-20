@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YELD Vol.01: The Return — Finance Noir</title>
+<meta name="description" content="YELD Volume 1: The Return. Solomon Von Herclestein meets Valentim at Lake Como. NTN-B 12.09% vs US Treasury 4.25%. The Cardinal Protocol. Finance noir graphic novel.">
+<meta name="author" content="Solomon Von Herclestein">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://yeld.com/vol01.html">
+<meta property="og:type" content="book">
+<meta property="og:title" content="YELD Vol.01: The Return — Finance Noir">
+<meta property="og:description" content="The first finance noir graphic novel. Solomon Von Herclestein. Lake Como. NTN-B 12.09%. The Cardinal Protocol begins.">
+<meta property="og:url" content="https://yeld.com/vol01.html">
+<meta property="og:image" content="https://yeld.com/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="YELD Vol.01: The Return — Finance Noir by Solomon Von Herclestein">
+<meta name="twitter:image" content="https://yeld.com/assets/og-image.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#060606;--green:#00ff88;--gold:#c9a84c;--white:#e8e4d9;--dim:#777}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--black);font-family:'Courier Prime',monospace}
+.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(6,6,6,0.97);border-bottom:1px solid rgba(0,255,136,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+.topbar-logo{font-size:11px;letter-spacing:.3em;color:var(--green)}
+.topbar-logo span{color:var(--gold)}
+.topbar-back{font-size:10px;letter-spacing:.2em;color:var(--dim);text-decoration:none;transition:color .2s}
+.topbar-back:hover{color:var(--green)}
+.progressbar{position:fixed;top:44px;left:0;right:0;height:2px;background:rgba(255,255,255,0.06);z-index:100;}
+.progressbar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .3s ease}
+.counter{position:fixed;top:54px;right:16px;font-size:10px;letter-spacing:.2em;color:var(--dim);z-index:100;background:rgba(6,6,6,0.8);padding:4px 8px;}
+.reader{position:fixed;top:46px;left:0;right:0;bottom:64px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.page-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none;transition:opacity .2s ease;}
+.tap-prev,.tap-next{position:fixed;top:46px;bottom:64px;width:40%;z-index:50;cursor:pointer;}
+.tap-prev{left:0}
+.tap-next{right:0}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(6,6,6,0.97);border-top:1px solid rgba(0,255,136,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:12px;z-index:100;}
+.nav-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:var(--white);font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.15em;padding:10px 20px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+.nav-btn:hover,.nav-btn:active{border-color:var(--green);color:var(--green)}
+.nav-btn:disabled{opacity:.2;pointer-events:none}
+.nav-btn.primary{background:var(--green);color:var(--black);border-color:var(--green);font-weight:700;flex:1;justify-content:center;}
+.nav-btn.primary:hover{background:#00ffaa}
+.thumb-strip{position:fixed;bottom:64px;left:0;right:0;height:0;overflow:hidden;background:rgba(6,6,6,0.98);border-top:1px solid rgba(255,255,255,0.05);transition:height .3s ease;z-index:99;}
+.thumb-strip.open{height:90px}
+.thumb-scroll{display:flex;gap:4px;padding:8px 12px;overflow-x:auto;height:100%;align-items:center;scrollbar-width:none;}
+.thumb-scroll::-webkit-scrollbar{display:none}
+.thumb{flex-shrink:0;width:54px;height:72px;object-fit:cover;cursor:pointer;border:1px solid rgba(255,255,255,0.05);opacity:.5;transition:all .2s;}
+.thumb.active{border-color:var(--green);opacity:1}
+.thumb:hover{opacity:.8}
+.strip-toggle{background:none;border:none;color:var(--dim);font-size:10px;letter-spacing:.2em;cursor:pointer;font-family:'Courier Prime',monospace;transition:color .2s;padding:0 4px;}
+.strip-toggle:hover{color:var(--green)}
+.text-overlay{position:fixed;top:46px;left:0;right:0;bottom:64px;background:var(--black);overflow-y:auto;padding:32px 24px 24px;display:none;}
+.text-overlay.visible{display:block}
+.text-part{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.4em;color:var(--gold);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.2)}
+.text-overlay p{font-family:'Georgia',serif;font-size:16px;line-height:1.9;margin-bottom:14px;color:#bbb8ac}
+.text-overlay p.narr{font-style:italic;color:#9a968a}
+.text-overlay p.dlg{color:var(--white)}
+.text-overlay p.dlg strong{color:var(--white)}
+.text-overlay .sys{font-family:'Courier Prime',monospace;font-size:12px;color:var(--green);line-height:2.2;letter-spacing:.1em;margin:20px 0}
+.text-overlay .end-note{margin-top:40px;padding-top:24px;border-top:1px solid rgba(201,168,76,.2)}
+.audio-bar{position:fixed;top:44px;right:0;display:flex;gap:8px;align-items:center;padding:6px 12px;z-index:101;background:rgba(6,6,6,0.9);}
+.audio-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:var(--dim);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;padding:3px 8px;cursor:pointer;transition:all .2s;}
+.audio-btn.active{color:var(--green);border-color:var(--green)}
+#yt-player{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+@media(min-width:768px){.tap-prev,.tap-next{width:35%}.text-overlay{padding:48px 60px}.text-overlay p{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="topbar-back">← ARCHIVE</a>
+  <div class="topbar-logo">YELD <span>/ FILE 001</span></div>
+  <button class="strip-toggle" onclick="toggleStrip()" title="All pages" aria-label="Toggle thumbnails">▦</button>
+</div>
+<div class="progressbar"><div class="progressbar-fill" id="prog"></div></div>
+<div class="counter" id="counter">1 / 38</div>
+<div class="audio-bar">
+  <button class="audio-btn" id="abtn" onclick="togglePlay()" aria-label="Play/Pause music">▶</button>
+  <div id="yt-player"></div>
+</div>
+<div class="reader" id="reader">
+  <img class="page-img" id="page-img" src="pages/page-01.jpg" alt="Page 1" draggable="false">
+</div>
+<div class="text-overlay" id="text-overlay"></div>
+<div class="tap-prev" onclick="prevPage()" role="button" aria-label="Previous page"></div>
+<div class="tap-next" onclick="nextPage()" role="button" aria-label="Next page"></div>
+<div class="thumb-strip" id="strip"><div class="thumb-scroll" id="thumb-scroll"></div></div>
+<div class="bottomnav">
+  <button class="nav-btn" id="btn-prev" onclick="prevPage()" disabled>← PREV</button>
+  <button class="nav-btn primary" id="btn-center" onclick="nextPage()">NEXT →</button>
+  <button class="nav-btn" id="btn-next" onclick="nextPage()">NEXT →</button>
+</div>
+<script>
+const TOTAL = 38;
+let current = 1, stripOpen = false, touchStartX = 0;
+const TEXT_PAGES = {
+  29: { part: 'EPISODE 1: THE RETURN — FULL TEXT', content: '<p class="narr">Continue lendo a HQ nas paginas 30 a 34. Texto completo disponivel no arquivo original.</p>' },
+  30: { part: 'PART II', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
+  31: { part: 'PART III', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
+  32: { part: 'PART IV', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
+  33: { part: 'PART V', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
+  34: { part: 'PART VI', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
+  35: { part: 'GLOSSARY', content: '<p class="narr">Glossario completo no original.</p>' },
+  36: { part: "AUTHOR'S NOTE", content: '<p class="narr">Nota do autor no original.</p>' },
+  37: { part: 'NEXT: VOLUME 2', content: '<p class="sys" style="text-align:center">VOLUME 2: THE NETWORK<br>COMING SOON</p>' },
+  38: { part: 'END', content: '<p class="sys" style="text-align:center">CARDINAL PROTOCOL: ACTIVE<br>STATUS: OPERATIONAL<br>YIELD: 12.09%</p><p style="text-align:center;margin-top:40px"><a href="index.html" style="color:var(--white);border:1px solid rgba(255,255,255,0.2);padding:12px 28px;text-decoration:none;font-family:Courier Prime,monospace;font-size:11px;letter-spacing:.25em">← BACK TO ARCHIVE</a></p>' }
+};
+function isTextPage(n){ return TEXT_PAGES[n] !== undefined; }
+function render(){
+  const prog = document.getElementById('prog'), counter = document.getElementById('counter');
+  const img = document.getElementById('page-img'), overlay = document.getElementById('text-overlay');
+  const btnPrev = document.getElementById('btn-prev'), btnNext = document.getElementById('btn-next'), btnCenter = document.getElementById('btn-center');
+  prog.style.width = ((current/TOTAL)*100)+'%';
+  counter.textContent = current + ' / ' + TOTAL;
+  btnPrev.disabled = current === 1;
+  if(current === TOTAL){
+    btnNext.style.display = 'none';
+    btnCenter.style.display = 'flex';
+    btnCenter.textContent = '← BACK TO ARCHIVE';
+    btnCenter.onclick = function(){ location.href = 'index.html'; };
+  } else {
+    btnNext.style.display = 'flex';
+    btnCenter.style.display = 'none';
+  }
+  if(isTextPage(current)){
+    img.style.display = 'none';
+    overlay.className = 'text-overlay visible';
+    overlay.innerHTML = '<div class="text-part">'+TEXT_PAGES[current].part+'</div>' + TEXT_PAGES[current].content;
+    overlay.scrollTop = 0;
+  } else {
+    overlay.className = 'text-overlay';
+    img.style.display = 'block';
+    img.style.opacity = '0';
+    img.src = 'pages/page-'+String(current).padStart(2,'0')+'.jpg';
+    img.onload = function(){ img.style.opacity = '1'; };
+  }
+  document.querySelectorAll('.thumb').forEach(function(t){ t.classList.toggle('active', parseInt(t.dataset.page) === current); });
+  const activeThumb = document.querySelector('.thumb.active');
+  if(activeThumb){ activeThumb.scrollIntoView({inline:'center',behavior:'smooth'}); }
+}
+function nextPage(){ if(current < TOTAL){ current++; render(); } }
+function prevPage(){ if(current > 1){ current--; render(); } }
+function goTo(n){ current = n; render(); if(stripOpen) toggleStrip(); }
+function toggleStrip(){ stripOpen = !stripOpen; document.getElementById('strip').classList.toggle('open', stripOpen); }
+function buildThumbs(){
+  const scroll = document.getElementById('thumb-scroll');
+  for(let i=1;i<=TOTAL;i++){
+    const img = document.createElement('img');
+    img.className = 'thumb' + (i===1?' active':'');
+    img.dataset.page = i;
+    img.src = 'pages/page-'+String(i).padStart(2,'0')+'.jpg';
+    img.onerror = function(){ this.style.background = '#111'; };
+    img.onclick = function(){ goTo(i); };
+    scroll.appendChild(img);
+  }
+}
+document.addEventListener('touchstart',function(e){ touchStartX = e.touches[0].clientX; },{passive:true});
+document.addEventListener('touchend',function(e){ const dx = e.changedTouches[0].clientX - touchStartX; if(Math.abs(dx) > 50){ if(dx < 0) nextPage(); else prevPage(); } },{passive:true});
+document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'||e.key===' ') nextPage(); if(e.key==='ArrowLeft') prevPage(); });
+var ytPlayer, isPlaying=false;
+document.getElementById('abtn').addEventListener('click', function initYT(){
+  if(window.YT) return;
+  var s = document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+  this.removeEventListener('click', initYT);
+}, { once: true });
+function onYouTubeIframeAPIReady(){
+  ytPlayer=new YT.Player('yt-player',{height:'1',width:'1',videoId:'JTTC_fD598A',playerVars:{autoplay:0,loop:1,playlist:'JTTC_fD598A'},events:{onReady:function(e){e.target.setVolume(35)}}});
+}
+function togglePlay(){
+  if(!ytPlayer)return;
+  var btn=document.getElementById('abtn');
+  if(!isPlaying){ytPlayer.playVideo();isPlaying=true;btn.textContent='⏸';btn.classList.add('active');}
+  else{ytPlayer.pauseVideo();isPlaying=false;btn.textContent='▶';btn.classList.remove('active');}
+}
+buildThumbs();
+render();
+</script>
+</body>
+</html>
