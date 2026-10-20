@@ -1,57 +1,146 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>YELD Vol.01: The Return — Finance Noir</title>
+<title>YELD Vol.01: The Return — Finance Noir | Solomon Von Herclestein</title>
 <meta name="description" content="YELD Volume 1: The Return. Solomon Von Herclestein meets Valentim at Lake Como. NTN-B 12.09% vs US Treasury 4.25%. The Cardinal Protocol. Finance noir graphic novel.">
+<meta name="keywords" content="finance noir, YELD chronicles, Solomon Von Herclestein, Cardinal Protocol, NTN-B, Brazilian bonds, graphic novel finance, wealth, old money, fixed income Brazil, financial graphic novel, Wall Street, Passalacqua">
 <meta name="author" content="Solomon Von Herclestein">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://yeld.com/vol01.html">
 <meta property="og:type" content="book">
 <meta property="og:title" content="YELD Vol.01: The Return — Finance Noir">
 <meta property="og:description" content="The first finance noir graphic novel. Solomon Von Herclestein. Lake Como. NTN-B 12.09%. The Cardinal Protocol begins.">
-<meta property="og:url" content="https://yeld.com/vol01.html">
-<meta property="og:image" content="https://yeld.com/assets/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="YELD Vol.01: The Return — Finance Noir by Solomon Von Herclestein">
-<meta name="twitter:image" content="https://yeld.com/assets/og-image.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--black:#060606;--green:#00ff88;--gold:#c9a84c;--white:#e8e4d9;--dim:#777}
+:root{--black:#060606;--green:#00ff88;--gold:#c9a84c;--white:#e8e4d9;--dim:#555}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--black);font-family:'Courier Prime',monospace}
-.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(6,6,6,0.97);border-bottom:1px solid rgba(0,255,136,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+
+/* TOP BAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;
+  height:44px;
+  background:rgba(6,6,6,0.97);
+  border-bottom:1px solid rgba(0,255,136,0.12);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;z-index:100;
+}
 .topbar-logo{font-size:11px;letter-spacing:.3em;color:var(--green)}
 .topbar-logo span{color:var(--gold)}
 .topbar-back{font-size:10px;letter-spacing:.2em;color:var(--dim);text-decoration:none;transition:color .2s}
 .topbar-back:hover{color:var(--green)}
-.progressbar{position:fixed;top:44px;left:0;right:0;height:2px;background:rgba(255,255,255,0.06);z-index:100;}
+
+/* PROGRESS BAR */
+.progressbar{
+  position:fixed;top:44px;left:0;right:0;height:2px;
+  background:rgba(255,255,255,0.06);z-index:100;
+}
 .progressbar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .3s ease}
-.counter{position:fixed;top:54px;right:16px;font-size:10px;letter-spacing:.2em;color:var(--dim);z-index:100;background:rgba(6,6,6,0.8);padding:4px 8px;}
-.reader{position:fixed;top:46px;left:0;right:0;bottom:64px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.page-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none;transition:opacity .2s ease;}
-.tap-prev,.tap-next{position:fixed;top:46px;bottom:64px;width:40%;z-index:50;cursor:pointer;}
+
+/* PAGE COUNTER */
+.counter{
+  position:fixed;top:54px;right:16px;
+  font-size:10px;letter-spacing:.2em;color:var(--dim);z-index:100;
+  background:rgba(6,6,6,0.8);padding:4px 8px;
+}
+
+/* READER */
+.reader{
+  position:fixed;top:46px;left:0;right:0;bottom:64px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+.page-img{
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+  transition:opacity .2s ease;
+}
+
+/* TAP ZONES (invisible) */
+.tap-prev,.tap-next{
+  position:fixed;top:46px;bottom:64px;width:40%;
+  z-index:50;cursor:pointer;
+}
 .tap-prev{left:0}
 .tap-next{right:0}
-.bottomnav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(6,6,6,0.97);border-top:1px solid rgba(0,255,136,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:12px;z-index:100;}
-.nav-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:var(--white);font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.15em;padding:10px 20px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+
+/* BOTTOM NAV */
+.bottomnav{
+  position:fixed;bottom:0;left:0;right:0;height:64px;
+  background:rgba(6,6,6,0.97);
+  border-top:1px solid rgba(0,255,136,0.12);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;gap:12px;z-index:100;
+}
+
+.nav-btn{
+  background:none;border:1px solid rgba(255,255,255,0.1);
+  color:var(--white);font-family:'Courier Prime',monospace;
+  font-size:12px;letter-spacing:.15em;
+  padding:10px 20px;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+}
 .nav-btn:hover,.nav-btn:active{border-color:var(--green);color:var(--green)}
 .nav-btn:disabled{opacity:.2;pointer-events:none}
-.nav-btn.primary{background:var(--green);color:var(--black);border-color:var(--green);font-weight:700;flex:1;justify-content:center;}
+
+.nav-btn.primary{
+  background:var(--green);color:var(--black);
+  border-color:var(--green);font-weight:700;
+  flex:1;justify-content:center;
+}
 .nav-btn.primary:hover{background:#00ffaa}
-.thumb-strip{position:fixed;bottom:64px;left:0;right:0;height:0;overflow:hidden;background:rgba(6,6,6,0.98);border-top:1px solid rgba(255,255,255,0.05);transition:height .3s ease;z-index:99;}
+
+/* THUMBNAIL STRIP (optional scroll) */
+.thumb-strip{
+  position:fixed;bottom:64px;left:0;right:0;
+  height:0;overflow:hidden;
+  background:rgba(6,6,6,0.98);
+  border-top:1px solid rgba(255,255,255,0.05);
+  transition:height .3s ease;
+  z-index:99;
+}
 .thumb-strip.open{height:90px}
-.thumb-scroll{display:flex;gap:4px;padding:8px 12px;overflow-x:auto;height:100%;align-items:center;scrollbar-width:none;}
+.thumb-scroll{
+  display:flex;gap:4px;padding:8px 12px;
+  overflow-x:auto;height:100%;align-items:center;
+  scrollbar-width:none;
+}
 .thumb-scroll::-webkit-scrollbar{display:none}
-.thumb{flex-shrink:0;width:54px;height:72px;object-fit:cover;cursor:pointer;border:1px solid rgba(255,255,255,0.05);opacity:.5;transition:all .2s;}
+.thumb{
+  flex-shrink:0;width:54px;height:72px;
+  object-fit:cover;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.05);
+  opacity:.5;transition:all .2s;
+}
 .thumb.active{border-color:var(--green);opacity:1}
 .thumb:hover{opacity:.8}
-.strip-toggle{background:none;border:none;color:var(--dim);font-size:10px;letter-spacing:.2em;cursor:pointer;font-family:'Courier Prime',monospace;transition:color .2s;padding:0 4px;}
+
+/* TOGGLE STRIP BTN */
+.strip-toggle{
+  background:none;border:none;color:var(--dim);
+  font-size:10px;letter-spacing:.2em;cursor:pointer;
+  font-family:'Courier Prime',monospace;
+  transition:color .2s;padding:0 4px;
+}
 .strip-toggle:hover{color:var(--green)}
-.text-overlay{position:fixed;top:46px;left:0;right:0;bottom:64px;background:var(--black);overflow-y:auto;padding:32px 24px 24px;display:none;}
+
+/* TEXT PAGES */
+.text-overlay{
+  position:fixed;top:46px;left:0;right:0;bottom:64px;
+  background:var(--black);overflow-y:auto;
+  padding:32px 24px 24px;display:none;
+}
 .text-overlay.visible{display:block}
 .text-part{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.4em;color:var(--gold);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.2)}
 .text-overlay p{font-family:'Georgia',serif;font-size:16px;line-height:1.9;margin-bottom:14px;color:#bbb8ac}
@@ -60,73 +149,254 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'Couri
 .text-overlay p.dlg strong{color:var(--white)}
 .text-overlay .sys{font-family:'Courier Prime',monospace;font-size:12px;color:var(--green);line-height:2.2;letter-spacing:.1em;margin:20px 0}
 .text-overlay .end-note{margin-top:40px;padding-top:24px;border-top:1px solid rgba(201,168,76,.2)}
-.audio-bar{position:fixed;top:44px;right:0;display:flex;gap:8px;align-items:center;padding:6px 12px;z-index:101;background:rgba(6,6,6,0.9);}
-.audio-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:var(--dim);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;padding:3px 8px;cursor:pointer;transition:all .2s;}
+
+/* AUDIO */
+.audio-bar{
+  position:fixed;top:44px;right:0;
+  display:flex;gap:8px;align-items:center;
+  padding:6px 12px;z-index:101;
+  background:rgba(6,6,6,0.9);
+}
+.audio-btn{
+  background:none;border:1px solid rgba(255,255,255,0.1);
+  color:var(--dim);font-family:'Courier Prime',monospace;
+  font-size:9px;letter-spacing:.15em;padding:3px 8px;
+  cursor:pointer;transition:all .2s;
+}
 .audio-btn.active{color:var(--green);border-color:var(--green)}
 #yt-player{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
-@media(min-width:768px){.tap-prev,.tap-next{width:35%}.text-overlay{padding:48px 60px}.text-overlay p{font-size:18px}}
+
+@media(min-width:768px){
+  .tap-prev,.tap-next{width:35%}
+  .text-overlay{padding:48px 60px}
+  .text-overlay p{font-size:18px}
+}
 </style>
 </head>
 <body>
+
+<!-- TOP BAR -->
 <div class="topbar">
   <a href="index.html" class="topbar-back">← ARCHIVE</a>
   <div class="topbar-logo">YELD <span>/ FILE 001</span></div>
-  <button class="strip-toggle" onclick="toggleStrip()" title="All pages" aria-label="Toggle thumbnails">▦</button>
+  <div class="strip-toggle" onclick="toggleStrip()" title="All pages">▦</div>
 </div>
+
+<!-- PROGRESS -->
 <div class="progressbar"><div class="progressbar-fill" id="prog"></div></div>
+
+<!-- COUNTER -->
 <div class="counter" id="counter">1 / 38</div>
+
+<!-- AUDIO -->
 <div class="audio-bar">
-  <button class="audio-btn" id="abtn" onclick="togglePlay()" aria-label="Play/Pause music">▶</button>
+  <button class="audio-btn" id="abtn" onclick="togglePlay()">▶</button>
   <div id="yt-player"></div>
 </div>
+
+<!-- READER -->
 <div class="reader" id="reader">
   <img class="page-img" id="page-img" src="pages/page-01.jpg" alt="Page 1" draggable="false">
 </div>
+
+<!-- TEXT OVERLAY (shown for text pages) -->
 <div class="text-overlay" id="text-overlay"></div>
-<div class="tap-prev" onclick="prevPage()" role="button" aria-label="Previous page"></div>
-<div class="tap-next" onclick="nextPage()" role="button" aria-label="Next page"></div>
-<div class="thumb-strip" id="strip"><div class="thumb-scroll" id="thumb-scroll"></div></div>
+
+<!-- TAP ZONES -->
+<div class="tap-prev" onclick="prevPage()"></div>
+<div class="tap-next" onclick="nextPage()"></div>
+
+<!-- THUMBNAIL STRIP -->
+<div class="thumb-strip" id="strip">
+  <div class="thumb-scroll" id="thumb-scroll"></div>
+</div>
+
+<!-- BOTTOM NAV -->
 <div class="bottomnav">
   <button class="nav-btn" id="btn-prev" onclick="prevPage()" disabled>← PREV</button>
   <button class="nav-btn primary" id="btn-center" onclick="nextPage()">NEXT →</button>
   <button class="nav-btn" id="btn-next" onclick="nextPage()">NEXT →</button>
 </div>
+
 <script>
+// ─── DATA ───────────────────────────────────────────────
 const TOTAL = 38;
-let current = 1, stripOpen = false, touchStartX = 0;
+let current = 1;
+let stripOpen = false;
+let touchStartX = 0;
+
+// Text pages: pages that show prose instead of image
+// Pages 29-38 are the text episode content
 const TEXT_PAGES = {
-  29: { part: 'EPISODE 1: THE RETURN — FULL TEXT', content: '<p class="narr">Continue lendo a HQ nas paginas 30 a 34. Texto completo disponivel no arquivo original.</p>' },
-  30: { part: 'PART II', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
-  31: { part: 'PART III', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
-  32: { part: 'PART IV', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
-  33: { part: 'PART V', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
-  34: { part: 'PART VI', content: '<p class="narr">Texto completo disponivel no arquivo original.</p>' },
-  35: { part: 'GLOSSARY', content: '<p class="narr">Glossario completo no original.</p>' },
-  36: { part: "AUTHOR'S NOTE", content: '<p class="narr">Nota do autor no original.</p>' },
-  37: { part: 'NEXT: VOLUME 2', content: '<p class="sys" style="text-align:center">VOLUME 2: THE NETWORK<br>COMING SOON</p>' },
-  38: { part: 'END', content: '<p class="sys" style="text-align:center">CARDINAL PROTOCOL: ACTIVE<br>STATUS: OPERATIONAL<br>YIELD: 12.09%</p><p style="text-align:center;margin-top:40px"><a href="index.html" style="color:var(--white);border:1px solid rgba(255,255,255,0.2);padding:12px 28px;text-decoration:none;font-family:Courier Prime,monospace;font-size:11px;letter-spacing:.25em">← BACK TO ARCHIVE</a></p>' }
+  29: { part: 'EPISODE 1: THE RETURN — FULL TEXT', content: `
+    <p class="narr" style="font-size:18px;color:var(--gold);font-style:normal;margin-bottom:28px;">"What you read in the comic was the movie. This is what I was thinking while it happened." — Solomon</p>
+    <div class="text-part">PART I — THE TOWER</div>
+    <p class="narr">I returned from the trip, parked my Cullinan, and went up. Sunday night, nobody in the building.</p>
+    <p class="narr">This motherfucker is mine.</p>
+    <p class="narr">Tower Raphaella. Named after my daughter. I built this and she moves and works in Switzerland. What irony…</p>
+    <p class="narr">I just came back from Passalacqua. A month waiting for the client, all paid. I didn't complain, it's part of the package. Wealthy families run their schedules. I also visited Santa Maria Novella, bought perfumes. Marvelous perfumery…</p>
+    <p class="narr">I can rest and come back tense. Because what I heard and saw in Europe wasn't good.</p>
+    <p class="narr">I remembered the Japanese market… changing rules, bringing down the US… who would've thought, revenge. New Pearl Harbor, now through finance.</p>
+    <p class="narr">20 years of stability, 4.5%, and now this. Well, in my calculations it took 10 years to react… old samurais.</p>
+  `},
+  30: { part: 'PART II — GOLD AND COLONIES', content: `
+    <p class="narr">Obviously, I went through Switzerland, saw my daughter… took a shipment of gold, bought from Africa at wholesale.</p>
+    <p class="narr">Poor bastards… colony always colony.</p>
+    <p class="narr">I don't make the rules. I just play the game.</p>
+    <p class="narr">Took it to my safe. Safe my father gave me the code for…</p>
+    <p class="dlg"><strong>— Memorize it! I'll only say it three times.</strong></p>
+    <p class="narr">My mother… obviously, in contrast to my father's harshness, helped me. She wrote it on paper, but I already had the code in mind for decades.</p>
+    <div class="text-part" style="margin-top:32px">PART III — MOTHER AND THE PIANO</div>
+    <p class="narr">I remember her. Loving, encouraging me with piano lessons… the music room, warmed by the fireplace… 2 meters of snow outside.</p>
+    <p class="dlg"><strong>— Today, Rossini!!! Face it and embody the feeling of the opera!!!</strong></p>
+    <p class="narr">She would say while singing as I played the piece. An old book, probably written by Rossini himself.</p>
+    <p class="dlg"><strong>— Today, Bizet! It's human daily life, the heart expressed in notes. Today, no reading, memorize!</strong></p>
+    <p class="narr">Playing like that trained my mind… prepared me for the market. Too many notes trained me… prepared me for excess information.</p>
+    <p class="narr" style="color:var(--gold)">Mom's missing… Dad…</p>
+  `},
+  31: { part: 'PART IV — THE OLD MAN\'S VOICE', content: `
+    <p class="narr">Now, in front of the green screen, I focus. The formula is always simple:</p>
+    <p class="sys">Don't lose money.<br>Time always works in your favor.<br>Don't follow the herd, don't read the newspaper.<br>They're always late.<br>Create your route.<br>Remember the Templars.</p>
+    <p class="narr">The old man's voice echoed… Ah… the Templars.</p>
+    <p class="narr">Administrator priests… ruled Europe. Yes, priest explorers. Took Christ to the Americas. 13 ships sailed… 3 arrived. Lost 70% of the initial investment… downgrade. But the result!! The Americas!!!</p>
+    <p class="narr">X km of land, endless lands. Silver, gemstones, timber, gold!!! Royal family in RJ still gets money… more than 500 years of income. Worth it…</p>
+    <div class="text-part" style="margin-top:32px">PART V — BRAZIL, THE INVISIBLE LAND</div>
+    <p class="narr">Today's Brazil is still the land of opportunities no one sees. No one.</p>
+    <p class="narr">I light a cigar… and look at my reflection on the screen.</p>
+    <p class="narr">For 10 years it has paid more than double the market. Fixed income between 10 and 12% → 200%. Real estate surge of 500%.</p>
+    <p class="narr">Any Oxford student, first-year, would see… but they're focused on China and India.</p>
+    <p class="narr">No pressure, I navigate with the wind in my favor. BlackRock entered crypto… they arrived and now play like they own the casino.</p>
+  `},
+  32: { part: 'PART VI — VALENTIM ARRIVES', content: `
+    <p class="narr">I hear a shout:</p>
+    <p class="dlg" style="font-size:22px;color:var(--gold)"><strong>— 4.5% IS LOW!!!</strong></p>
+    <p class="narr">Valentim had arrived in Passalacqua. Sitting by Lake Como, Italy… screaming like a goose while eating cheese with ham and drinking champagne.</p>
+    <p class="dlg"><strong>— That's why you're fat…</strong> I said.</p>
+    <p class="narr">He shoved another 100 grams in his mouth along with the drink.</p>
+    <p class="dlg"><strong>— Come on, speak!!! You disappeared… but always know the next move. Uranium mines… gold… do you still buy gold from the African dictator?</strong></p>
+    <p class="narr">Laughter… <strong>— I don't know anything…</strong></p>
+    <p class="dlg"><strong>— Did the Bellini suite not move your heart? You lay your ass where Churchill and Napoleon slept… that's expensive… now thank me, you market bitch!</strong></p>
+    <p class="narr">Really, you know how to please… thanks, I needed this trip.</p>
+    <div class="text-part" style="margin-top:32px">PART VII — BRAZIL!</div>
+    <p class="dlg" style="font-size:24px;font-family:'Georgia',serif;color:var(--white)"><strong>— BRAZIL!!!</strong></p>
+    <p class="narr">He, chubby, startled, almost fell from the chair. The ham flew… the waiter ran.</p>
+    <p class="dlg"><strong>— What the hell!!! For God's sake…</strong></p>
+    <p class="dlg"><strong>— Brazil, Valentim… 100% fixed in 8 years. They're paying 12.09% per year. The new gold mine.</strong></p>
+    <p class="narr">He downed another glass, as if he hadn't heard. And maybe he hadn't…</p>
+    <p class="narr">At that moment, two young women passed by… Behind them, 5 kids with cameras heading toward the hotel's yacht.</p>
+    <p class="dlg"><strong>— They're YouTubers… The new TV! These girls are billionaires…</strong></p>
+    <p class="narr">I looked… again. Not for long… observing how they spend.</p>
+  `},
+  33: { part: 'PART VIII — PIPE AND DIPLOMACY', content: `
+    <p class="narr">I lit the pipe… Dutch tobacco in a 1890 English rosewood cigar.</p>
+    <p class="dlg"><strong>— You're a Renaissance man…</strong> he said.</p>
+    <p class="dlg"><strong>— So… do you endorse this or not? 100% in 8 years… excellent.</strong></p>
+    <p class="narr">I looked and fixed my eyes into his.</p>
+    <p class="narr" style="font-style:italic;color:var(--dim)">That look… murderous. I think it's true… he thought. And it was true.</p>
+    <p class="narr">Simple protocol. Cardinal. A project I wrote myself for foreign investors in Brazilian territory.</p>
+    <p class="dlg"><strong>— Can you transfer?</strong></p>
+    <p class="dlg"><strong>— Yes, yes, from the Swiss fund.</strong></p>
+    <p class="dlg"><strong>— No, no. Take it from Dominica. The Dominica fund…</strong></p>
+    <p class="narr">Dominica… laughter. I still have their diplomatic passport, valid for 3 more years.</p>
+    <p class="dlg"><strong>— 250k and the airports open their legs…</strong></p>
+    <div class="text-part" style="margin-top:32px">PART IX — NTN-B ABC</div>
+    <p class="narr">In short: 12.09%. Transfer Brazil fund → Tesouro Direto, NTN-B.</p>
+    <p class="narr">He whistling: <strong>— NTN-B… ABC…</strong></p>
+    <p class="dlg"><strong>— I don't want that… you manage it!!!</strong></p>
+    <p class="dlg"><strong>— Fine. I send annual report for 8 years. But you make the decisions. Keep it as consultancy. Local CVM rules.</strong></p>
+    <p class="narr">He again: <strong>— NTN-B, ABC, CVM…</strong></p>
+    <p class="narr">That pissed me off. How can someone so rich be so dumb…</p>
+    <p class="dlg"><strong>— Securities and Exchange Commission… theirs.</strong></p>
+    <p class="dlg"><strong>— Fuck it!</strong> he shouted. The waiter smiled.</p>
+  `},
+  34: { part: 'PART X — LINEAGE AND SECRETS', content: `
+    <p class="dlg"><strong>— And take me to your Lineage for their Carnival. I want to meet those Brazilian asses.</strong></p>
+    <p class="dlg"><strong>— You're in heat… seem crazy…</strong></p>
+    <p class="dlg"><strong>— Wait… how do you know about my Embraer? It's in a secret fund…</strong></p>
+    <p class="dlg" style="font-size:20px;color:var(--gold)"><strong>— I know everything, Solomon.</strong></p>
+    <p class="narr">Silence.</p>
+    <p class="dlg" style="font-style:italic"><strong>— I've been here a long time.</strong></p>
+    <p class="narr">I looked at him. Fat. Eating. Drinking. Laughing.</p>
+    <p class="narr">But in the eyes…</p>
+    <p class="narr">In the eyes, there was something else.</p>
+    <p class="narr">Something I recognized. Because I have it too.</p>
+    <div class="end-note">
+      <p class="sys">[ END OF EPISODE 1 ]<br>> CARDINAL PROTOCOL: ACTIVATED<br>YIELD: 12.09% — DURATION: 8Y<br><br>VOLUME 2: THE NETWORK<br>COMING SOON</p>
+    </div>
+  `},
+  35: { part: 'GLOSSARY OF FINANCIAL TERMS', content: `
+    <div style="display:grid;grid-template-columns:1fr;gap:20px;margin-top:8px">
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">PRINCIPAL</p><p class="narr" style="font-style:normal">The initial invested capital, e.g., $100,000.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">ANNUAL YIELD</p><p class="narr" style="font-style:normal">Percentage return per year, e.g., 4.5% or 12.09%.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">YIELD DIFFERENTIAL</p><p class="narr" style="font-style:normal">Percentage difference between two return rates.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">COMPOUND GROWTH</p><p class="narr" style="font-style:normal">Accumulated growth based on compounding interest.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">OPPORTUNITY COST</p><p class="narr" style="font-style:normal">Potential loss from choosing a lower-performing option.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">CAGR</p><p class="narr" style="font-style:normal">Compound Annual Growth Rate — average annual growth considering compounding.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">NTN-B / TESOURO IPCA+</p><p class="narr" style="font-style:normal">Brazilian inflation-linked sovereign bond. Real yield + IPCA inflation index.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">CMN 4.373</p><p class="narr" style="font-style:normal">Brazilian regulation enabling non-resident foreign capital investment in local markets.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">RISK–PREMIUM</p><p class="narr" style="font-style:normal">Additional return required to compensate for higher risk.</p></div>
+      <div><p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.2em;color:var(--white);margin-bottom:4px">ASYMMETRIC RETURN</p><p class="narr" style="font-style:normal">Disproportionately higher return relative to base risk.</p></div>
+    </div>
+  `},
+  36: { part: 'AUTHOR\'S NOTE', content: `
+    <p class="narr" style="font-style:normal;color:var(--white)">This graphic novel documents real operational structures in the Brazilian financial market.</p>
+    <p class="narr" style="font-style:normal;margin-top:20px">The numbers are verifiable:</p>
+    <p class="sys">— US Treasury 10Y: ~4.25% (2024–2026)<br>— Tesouro IPCA+: ~12% (2024–2026)<br>— Spread: USD 7,750 / year per USD 100k</p>
+    <p class="narr" style="font-style:normal">The Cardinal Protocol exists. The jurisdictions mentioned exist. The methods are legal and auditable.</p>
+    <p class="narr" style="margin-top:20px;color:var(--gold)">What you do with this information is none of my business.</p>
+    <p style="font-family:'Courier Prime',monospace;font-size:18px;color:var(--white);margin-top:32px">solomon von herclestein</p>
+    <p style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--dim);letter-spacing:.2em;margin-top:6px">141 FINANCIAL CERTIFICATIONS · 20 YEARS IN THE BRAZILIAN MARKET</p>
+    <p style="margin-top:28px"><a href="https://www.instagram.com/solomonvonherclestein" target="_blank" style="font-family:'Courier Prime',monospace;font-size:12px;color:var(--gold);letter-spacing:.2em;border:1px solid var(--gold);padding:12px 24px;text-decoration:none;display:inline-block">@solomonvonherclestein</a></p>
+  `},
+  37: { part: 'NEXT: VOLUME 2', content: `
+    <div style="text-align:center;padding:40px 0">
+      <p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.4em;color:var(--dim);margin-bottom:16px">COMING NEXT</p>
+      <p style="font-family:'Georgia',serif;font-size:28px;color:var(--white);margin-bottom:10px">Volume 2: The Network</p>
+      <p style="font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.2em;color:var(--gold);margin-bottom:32px">THE OFFSHORE STRUCTURE — CLASSIFIED</p>
+      <p class="sys" style="text-align:left">DM KEYWORD: CARDINAL<br>TO BE NOTIFIED FIRST</p>
+      <a href="https://www.instagram.com/solomonvonherclestein" target="_blank" style="display:inline-block;margin-top:32px;font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.25em;color:var(--green);border:1px solid var(--green);padding:14px 28px;text-decoration:none">DM: CARDINAL</a>
+    </div>
+  `},
+  38: { part: 'END', content: `
+    <div style="text-align:center;padding:60px 0">
+      <p style="font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.4em;color:var(--dim);margin-bottom:32px">HERCLESTEIN FILES</p>
+      <p class="sys" style="text-align:center">CARDINAL PROTOCOL: ACTIVE<br>STATUS: OPERATIONAL<br>YIELD: 12.09%<br>DURATION: 8Y<br>COMPLIANCE: GREEN ✓</p>
+      <p style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--dim);letter-spacing:.15em;margin-top:48px">YELD: CHRONICLES OF THE FINANCIAL MARKET<br>© 2026 SOLOMON VON HERCLESTEIN<br>ALL RIGHTS RESERVED</p>
+      <a href="index.html" style="display:inline-block;margin-top:40px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.25em;color:var(--white);border:1px solid rgba(255,255,255,0.2);padding:12px 28px;text-decoration:none">← BACK TO ARCHIVE</a>
+    </div>
+  `}
 };
+
+// ─── RENDER ─────────────────────────────────────────────
 function isTextPage(n){ return TEXT_PAGES[n] !== undefined; }
+
 function render(){
-  const prog = document.getElementById('prog'), counter = document.getElementById('counter');
-  const img = document.getElementById('page-img'), overlay = document.getElementById('text-overlay');
-  const btnPrev = document.getElementById('btn-prev'), btnNext = document.getElementById('btn-next'), btnCenter = document.getElementById('btn-center');
+  const prog = document.getElementById('prog');
+  const counter = document.getElementById('counter');
+  const img = document.getElementById('page-img');
+  const overlay = document.getElementById('text-overlay');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const btnCenter = document.getElementById('btn-center');
+
   prog.style.width = ((current/TOTAL)*100)+'%';
   counter.textContent = current + ' / ' + TOTAL;
+
   btnPrev.disabled = current === 1;
+
   if(current === TOTAL){
     btnNext.style.display = 'none';
-    btnCenter.style.display = 'flex';
-    btnCenter.textContent = '← BACK TO ARCHIVE';
-    btnCenter.onclick = function(){ location.href = 'index.html'; };
+    btnCenter.style.display = 'none';
   } else {
     btnNext.style.display = 'flex';
     btnCenter.style.display = 'none';
   }
+
   if(isTextPage(current)){
+    const data = TEXT_PAGES[current];
     img.style.display = 'none';
     overlay.className = 'text-overlay visible';
-    overlay.innerHTML = '<div class="text-part">'+TEXT_PAGES[current].part+'</div>' + TEXT_PAGES[current].content;
+    overlay.innerHTML = '<div class="text-part">'+data.part+'</div>' + data.content;
     overlay.scrollTop = 0;
   } else {
     overlay.className = 'text-overlay';
@@ -135,37 +405,71 @@ function render(){
     img.src = 'pages/page-'+String(current).padStart(2,'0')+'.jpg';
     img.onload = function(){ img.style.opacity = '1'; };
   }
-  document.querySelectorAll('.thumb').forEach(function(t){ t.classList.toggle('active', parseInt(t.dataset.page) === current); });
+
+  // update thumbs
+  document.querySelectorAll('.thumb').forEach(function(t){
+    t.classList.toggle('active', parseInt(t.dataset.page) === current);
+  });
+
+  // scroll active thumb into view
   const activeThumb = document.querySelector('.thumb.active');
   if(activeThumb){ activeThumb.scrollIntoView({inline:'center',behavior:'smooth'}); }
 }
+
 function nextPage(){ if(current < TOTAL){ current++; render(); } }
 function prevPage(){ if(current > 1){ current--; render(); } }
+
 function goTo(n){ current = n; render(); if(stripOpen) toggleStrip(); }
-function toggleStrip(){ stripOpen = !stripOpen; document.getElementById('strip').classList.toggle('open', stripOpen); }
+
+function toggleStrip(){
+  stripOpen = !stripOpen;
+  document.getElementById('strip').classList.toggle('open', stripOpen);
+}
+
+// ─── THUMBNAILS ──────────────────────────────────────────
 function buildThumbs(){
   const scroll = document.getElementById('thumb-scroll');
   for(let i=1;i<=TOTAL;i++){
     const img = document.createElement('img');
     img.className = 'thumb' + (i===1?' active':'');
     img.dataset.page = i;
-    img.src = 'pages/page-'+String(i).padStart(2,'0')+'.jpg';
-    img.onerror = function(){ this.style.background = '#111'; };
+    if(i <= 28){
+      img.src = 'pages/page-'+String(i).padStart(2,'0')+'.jpg';
+    } else {
+      img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="54" height="72"%3E%3Crect width="54" height="72" fill="%23111"/%3E%3Ctext x="27" y="40" text-anchor="middle" fill="%23555" font-size="10" font-family="monospace"%3E'+i+'%3C/text%3E%3C/svg%3E';
+    }
     img.onclick = function(){ goTo(i); };
     scroll.appendChild(img);
   }
 }
-document.addEventListener('touchstart',function(e){ touchStartX = e.touches[0].clientX; },{passive:true});
-document.addEventListener('touchend',function(e){ const dx = e.changedTouches[0].clientX - touchStartX; if(Math.abs(dx) > 50){ if(dx < 0) nextPage(); else prevPage(); } },{passive:true});
-document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'||e.key===' ') nextPage(); if(e.key==='ArrowLeft') prevPage(); });
+
+// ─── SWIPE ───────────────────────────────────────────────
+document.addEventListener('touchstart',function(e){
+  touchStartX = e.touches[0].clientX;
+},{passive:true});
+
+document.addEventListener('touchend',function(e){
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 50){
+    if(dx < 0) nextPage();
+    else prevPage();
+  }
+},{passive:true});
+
+// ─── KEYBOARD ────────────────────────────────────────────
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' ') nextPage();
+  if(e.key==='ArrowLeft') prevPage();
+});
+
+// ─── AUDIO ───────────────────────────────────────────────
 var ytPlayer, isPlaying=false;
-document.getElementById('abtn').addEventListener('click', function initYT(){
-  if(window.YT) return;
-  var s = document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
-  this.removeEventListener('click', initYT);
-}, { once: true });
 function onYouTubeIframeAPIReady(){
-  ytPlayer=new YT.Player('yt-player',{height:'1',width:'1',videoId:'JTTC_fD598A',playerVars:{autoplay:0,loop:1,playlist:'JTTC_fD598A'},events:{onReady:function(e){e.target.setVolume(35)}}});
+  ytPlayer=new YT.Player('yt-player',{
+    height:'1',width:'1',videoId:'JTTC_fD598A',
+    playerVars:{autoplay:0,loop:1,playlist:'JTTC_fD598A'},
+    events:{onReady:function(e){e.target.setVolume(35)}}
+  });
 }
 function togglePlay(){
   if(!ytPlayer)return;
@@ -173,8 +477,17 @@ function togglePlay(){
   if(!isPlaying){ytPlayer.playVideo();isPlaying=true;btn.textContent='⏸';btn.classList.add('active');}
   else{ytPlayer.pauseVideo();isPlaying=false;btn.textContent='▶';btn.classList.remove('active');}
 }
+document.addEventListener('click',function(){
+  if(ytPlayer&&!isPlaying){ytPlayer.playVideo();isPlaying=true;
+    document.getElementById('abtn').textContent='⏸';
+    document.getElementById('abtn').classList.add('active');
+  }
+},{once:true});
+
+// ─── INIT ────────────────────────────────────────────────
 buildThumbs();
 render();
 </script>
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
